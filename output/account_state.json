@@ -1,0 +1,13 @@
+{
+  "handle": "@wa.3ibad.lah4",
+  "created_at": "2026-10-10",
+  "current_day": 1,
+  "current_phase": "WARM_UP_P1",
+  "total_videos_posted": 0,
+  "daily_history": {
+    "2026-10-10": {
+      "videos_posted": 0,
+      "warmed_up": false
+    }
+  }
+}
