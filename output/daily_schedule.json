@@ -1,0 +1,38 @@
+[
+  {
+    "time": "20:30",
+    "slot": "وقت الذروة الليلي (Prime Time)",
+    "episode_id": 1,
+    "headline": "برلمان الوردة يؤيد المشاركة الحكومية",
+    "character": "مول الطاكسي vs المسؤول",
+    "status": "جاهز للنشر 🚀",
+    "badge": "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
+  },
+  {
+    "time": "21:15",
+    "slot": "فترة السمر والدردشة",
+    "episode_id": 2,
+    "headline": "تقليص عدد الوزراء والجدل البرلماني",
+    "character": "مول الحانوت vs المسؤول",
+    "status": "مجدول ⏳",
+    "badge": "bg-amber-500/20 text-amber-400 border-amber-500/30"
+  },
+  {
+    "time": "22:00",
+    "slot": "التفاعل الأقصى في المساء",
+    "episode_id": 3,
+    "headline": "تراجع الدرهم والأسعار في السوق",
+    "character": "با رحال الفلاح vs المسؤول",
+    "status": "مجدول ⏳",
+    "badge": "bg-blue-500/20 text-blue-400 border-blue-500/30"
+  },
+  {
+    "time": "22:45",
+    "slot": "سهرة التيك توك",
+    "episode_id": 4,
+    "headline": "أزمة الحليب والأبقار المستوردة",
+    "character": "المواطن vs المسؤول",
+    "status": "مجدول ⏳",
+    "badge": "bg-purple-500/20 text-purple-400 border-purple-500/30"
+  }
+]

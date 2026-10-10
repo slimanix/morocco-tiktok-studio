@@ -3,163 +3,283 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم السحابية | @wa.3ibad.lah4</title>
+    <title>لوحة التحكم السحابية الذكية | @wa.3ibad.lah4</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Cairo', sans-serif; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #0b0f19; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #334155; }
     </style>
 </head>
-<body class="bg-gray-950 text-gray-100 min-h-screen">
+<body class="bg-gray-950 text-gray-100 min-h-screen antialiased selection:bg-red-600 selection:text-white">
 
-    <!-- Header -->
-    <header class="border-b border-gray-800 bg-gray-900/80 backdrop-blur sticky top-0 z-50">
-        <div class="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
+    <!-- Top Navigation / Header -->
+    <header class="border-b border-gray-800 bg-gray-900/90 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full border-2 border-red-500 overflow-hidden bg-gray-800 shrink-0">
+                <div class="w-11 h-11 rounded-full border-2 border-red-500 overflow-hidden bg-gray-800 shrink-0 shadow-lg shadow-red-950/40">
                     <img src="output/tiktok_profile_logo.jpg" alt="Logo" class="w-full h-full object-cover">
                 </div>
                 <div>
-                    <h1 class="text-base md:text-lg font-bold text-white flex items-center gap-2">
-                        وا عباد الله <span class="text-[10px] bg-red-600 text-white px-2 py-0.5 rounded-full">سحابي ☁️</span>
+                    <h1 class="text-base md:text-lg font-black text-white flex items-center gap-2">
+                        وا عباد الله <span class="text-[10px] bg-red-600 text-white font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">سحابي ☁️ v2.5</span>
                     </h1>
-                    <p class="text-xs text-gray-400">@wa.3ibad.lah4 • نظام الإنتاج التلقائي</p>
+                    <p class="text-xs text-gray-400">@wa.3ibad.lah4 • استوديو الإنتاج الآلي والأرشفة الذكية</p>
                 </div>
             </div>
-            <div class="flex items-center gap-2 bg-emerald-950/60 border border-emerald-800/80 px-3 py-1.5 rounded-full">
-                <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span class="text-xs font-semibold text-emerald-300">سيرفر GitHub نشط</span>
+
+            <!-- Header Badges & Quick Action -->
+            <div class="flex items-center gap-2.5">
+                <button onclick="triggerImmediateRun()" class="hidden sm:flex items-center gap-1.5 text-xs bg-red-600 hover:bg-red-500 active:scale-95 text-white font-bold px-3 py-1.5 rounded-lg transition shadow-md shadow-red-950/60">
+                    <span>⚡ تشغيل حلقة فورية</span>
+                </button>
+                <div class="flex items-center gap-2 bg-emerald-950/70 border border-emerald-800/80 px-3 py-1.5 rounded-full">
+                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span class="text-xs font-semibold text-emerald-300">سيرفر GitHub نشط</span>
+                </div>
             </div>
         </div>
     </header>
 
+    <!-- Navigation Tabs -->
+    <nav class="border-b border-gray-800/80 bg-gray-900/50">
+        <div class="max-w-7xl mx-auto px-4 flex items-center gap-2 overflow-x-auto py-2 text-xs font-bold">
+            <button onclick="switchTab('overview')" id="tab-btn-overview" class="tab-btn px-4 py-2 rounded-lg bg-red-600 text-white transition flex items-center gap-1.5 shrink-0">
+                <span>📊 لوحة القيادة المباشرة</span>
+            </button>
+            <button onclick="switchTab('gallery')" id="tab-btn-gallery" class="tab-btn px-4 py-2 rounded-lg bg-gray-800/70 text-gray-300 hover:bg-gray-800 transition flex items-center gap-1.5 shrink-0">
+                <span>🎬 معرض الحلقات المكتملة</span>
+            </button>
+            <button onclick="switchTab('characters')" id="tab-btn-characters" class="tab-btn px-4 py-2 rounded-lg bg-gray-800/70 text-gray-300 hover:bg-gray-800 transition flex items-center gap-1.5 shrink-0">
+                <span>🎭 استوديو الشخصيات والأصوات</span>
+            </button>
+            <button onclick="switchTab('schedule')" id="tab-btn-schedule" class="tab-btn px-4 py-2 rounded-lg bg-gray-800/70 text-gray-300 hover:bg-gray-800 transition flex items-center gap-1.5 shrink-0">
+                <span>⏰ جدول النشر وذروة المشاهدة</span>
+            </button>
+            <button onclick="switchTab('health')" id="tab-btn-health" class="tab-btn px-4 py-2 rounded-lg bg-gray-800/70 text-gray-300 hover:bg-gray-800 transition flex items-center gap-1.5 shrink-0">
+                <span>🛡️ سلامة النظام ومكافحة الحظر</span>
+            </button>
+        </div>
+    </nav>
+
     <!-- Main Container -->
-    <main class="max-w-6xl mx-auto px-4 py-6 space-y-6">
+    <main class="max-w-7xl mx-auto px-4 py-6 space-y-6">
 
-        <!-- Metrics Grid -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-            <div class="bg-gray-900/90 border border-gray-800 rounded-xl p-4">
-                <p class="text-xs text-gray-400">مرحلة الحساب</p>
-                <h3 id="phase-val" class="text-lg md:text-xl font-bold text-amber-400 mt-1">WARM_UP_P1</h3>
-                <p class="text-[11px] text-gray-500 mt-1">اليوم 1 • بناء الثقة</p>
-            </div>
-            <div class="bg-gray-900/90 border border-gray-800 rounded-xl p-4">
-                <p class="text-xs text-gray-400">الهدف اليومي</p>
-                <h3 class="text-lg md:text-xl font-bold text-white mt-1">1 فيديو (آمن)</h3>
-                <p class="text-[11px] text-gray-500 mt-1">وقت النشر: 20:30 المغرب</p>
-            </div>
-            <div class="bg-gray-900/90 border border-gray-800 rounded-xl p-4">
-                <p class="text-xs text-gray-400">المحرك السحابي</p>
-                <h3 class="text-lg md:text-xl font-bold text-blue-400 mt-1">GitHub Actions</h3>
-                <p class="text-[11px] text-gray-500 mt-1">2000 دقيقة سحابية مجانية</p>
-            </div>
-            <div class="bg-gray-900/90 border border-gray-800 rounded-xl p-4">
-                <p class="text-xs text-gray-400">التكلفة الشهرية</p>
-                <h3 class="text-lg md:text-xl font-bold text-emerald-400 mt-1">0.00 $ (مجاني 100%)</h3>
-                <p class="text-[11px] text-gray-500 mt-1">Vercel + GitHub + GPU</p>
-            </div>
-        </div>
-
-        <!-- Video Preview & Topics -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- ================= TAB 1: OVERVIEW ================= -->
+        <div id="tab-content-overview" class="tab-content space-y-6">
             
-            <!-- Video Preview Card -->
-            <div class="bg-gray-900 border border-gray-800 rounded-xl p-5 flex flex-col items-center">
-                <h2 class="text-sm font-bold text-white mb-3 self-start flex items-center gap-2">
-                    🎬 آخر حلقة منتجة بالترجمة
-                </h2>
-                <div class="w-full max-w-[260px] aspect-[9/16] bg-black rounded-lg overflow-hidden border border-gray-800 relative shadow-2xl">
-                    <video controls class="w-full h-full object-contain" poster="output/background.jpg">
-                        <source src="output/test_official_with_subtitles.mp4" type="video/mp4">
-                    </video>
+            <!-- Metrics Grid -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+                <div class="bg-gray-900/90 border border-gray-800 rounded-xl p-4 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
+                    <p class="text-xs text-gray-400">مرحلة الحساب (TikTok Growth)</p>
+                    <h3 id="phase-val" class="text-lg md:text-xl font-bold text-amber-400 mt-1">WARM_UP_P1</h3>
+                    <p class="text-[11px] text-gray-500 mt-1">اليوم 1 • بناء ثقة خوارزمية تيك توك</p>
                 </div>
-                <div class="mt-3 text-center">
-                    <p class="text-xs text-gray-200 font-bold">حقيقة أسعار المحروقات ⛽</p>
-                    <span class="text-[11px] text-emerald-400">جاهزة للنشر التلقائي</span>
+                <div class="bg-gray-900/90 border border-gray-800 rounded-xl p-4 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
+                    <p class="text-xs text-gray-400">الهدف اليومي المبرمج</p>
+                    <h3 class="text-lg md:text-xl font-bold text-white mt-1">1 فيديو (آمن)</h3>
+                    <p class="text-[11px] text-gray-500 mt-1">وقت النشر: 20:30 بتوقيت المغرب</p>
+                </div>
+                <div class="bg-gray-900/90 border border-gray-800 rounded-xl p-4 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
+                    <p class="text-xs text-gray-400">التكلفة الشهرية للمشروع</p>
+                    <h3 class="text-lg md:text-xl font-bold text-emerald-400 mt-1">0.00 $ (مجاني دائماً)</h3>
+                    <p class="text-[11px] text-gray-500 mt-1">ZeroGPU + RubberBand TTS + Vercel</p>
+                </div>
+                <div class="bg-gray-900/90 border border-gray-800 rounded-xl p-4 relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-1 h-full bg-purple-500"></div>
+                    <p class="text-xs text-gray-400">حالة مزامنة الذكاء الاصطناعي</p>
+                    <h3 class="text-lg md:text-xl font-bold text-purple-400 mt-1">ذكوري vs أنثوي ✅</h3>
+                    <p class="text-[11px] text-gray-500 mt-1">حركة الشفاه نشطة 100%</p>
                 </div>
             </div>
 
-            <!-- News Topics Feed -->
-            <div class="md:col-span-2 bg-gray-900 border border-gray-800 rounded-xl p-5 flex flex-col">
-                <div class="flex items-center justify-between mb-4 border-b border-gray-800 pb-3">
-                    <div>
-                        <h2 class="text-sm font-bold text-white flex items-center gap-2">
-                            📡 بنك مواضيع اليوم الساخنة (هسبريس)
-                        </h2>
-                        <p class="text-xs text-gray-400">يتم استخراج الأخبار والسيناريوهات تلقائياً كل صباح</p>
-                    </div>
-                </div>
+            <!-- Video Preview & Live Topics Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 
-                <div id="topics-container" class="space-y-2 overflow-y-auto max-h-[460px] pr-1">
-                    <!-- Loaded dynamically from output/daily_topics.json -->
-                    <div class="p-3 bg-gray-950/70 rounded-lg border border-gray-800/80">
-                        <p class="text-xs font-semibold text-gray-200">لشكر يقترح تقليص عدد الوزراء ويرفض منطق "البيسري" في توزيع الحقائب</p>
-                        <span class="text-[10px] text-amber-400 mt-1 inline-block">[سياسة • المواطن vs المسؤول]</span>
+                <!-- Video Preview Card -->
+                <div class="bg-gray-900 border border-gray-800 rounded-xl p-5 flex flex-col items-center">
+                    <div class="w-full flex items-center justify-between mb-3">
+                        <h2 class="text-sm font-bold text-white flex items-center gap-2">
+                            🎬 آخر حلقة منتجة (مول الطاكسي vs المسؤول)
+                        </h2>
+                        <span class="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full font-bold">1080x1920 HD</span>
                     </div>
-                    <div class="p-3 bg-gray-950/70 rounded-lg border border-gray-800/80">
-                        <p class="text-xs font-semibold text-gray-200">سعر الدرهم يتراجع أمام الأورو والدولار</p>
-                        <span class="text-[10px] text-amber-400 mt-1 inline-block">[اقتصاد • مول الحانوت vs المسؤول]</span>
+                    
+                    <div class="w-full max-w-[270px] aspect-[9/16] bg-black rounded-xl overflow-hidden border border-gray-800 relative shadow-2xl">
+                        <video controls class="w-full h-full object-contain" poster="output/background.jpg" preload="metadata">
+                            <source src="output/test_official_with_subtitles.mp4" type="video/mp4">
+                            متصفحك لا يدعم تشغيل الفيديو
+                        </video>
                     </div>
-                    <div class="p-3 bg-gray-950/70 rounded-lg border border-gray-800/80">
-                        <p class="text-xs font-semibold text-gray-200">تأخر استيراد الأبقار يقلق منتجي الحليب بالمغرب</p>
-                        <span class="text-[10px] text-amber-400 mt-1 inline-block">[فلاحة • الفلاح با رحال vs المسؤول]</span>
-                    </div>
-                    <div class="p-3 bg-gray-950/70 rounded-lg border border-gray-800/80">
-                        <p class="text-xs font-semibold text-gray-200">مرضى الصرع يشتكون غياب أدوية "غاردينال" بالصيدليات</p>
-                        <span class="text-[10px] text-amber-400 mt-1 inline-block">[صحة • الطبيب vs المسؤول]</span>
+
+                    <div class="mt-4 text-center w-full">
+                        <p class="text-xs text-gray-200 font-bold">حلقة اليوم: برلمان الوردة والمشاركة الحكومية 🏛️</p>
+                        <div class="flex items-center justify-center gap-2 mt-2">
+                            <span class="text-[11px] bg-gray-800 text-amber-400 px-2.5 py-1 rounded border border-gray-700 font-semibold">🎙️ صوت رجولي حاد</span>
+                            <span class="text-[11px] bg-gray-800 text-blue-400 px-2.5 py-1 rounded border border-gray-700 font-semibold">👄 حركة شفاه كاملة</span>
+                        </div>
                     </div>
                 </div>
+
+                <!-- News Topics Feed -->
+                <div class="lg:col-span-2 bg-gray-900 border border-gray-800 rounded-xl p-5 flex flex-col">
+                    <div class="flex items-center justify-between mb-4 border-b border-gray-800 pb-3">
+                        <div>
+                            <h2 class="text-sm font-bold text-white flex items-center gap-2">
+                                📡 بنك مواضيع اليوم الساخنة (هسبريس)
+                            </h2>
+                            <p class="text-xs text-gray-400">يتم استخراج الأخبار وترشيح الشخصية المناسبة تلقائياً كل صباح</p>
+                        </div>
+                        <span class="text-xs bg-gray-800 text-gray-300 px-2.5 py-1 rounded-full border border-gray-700 font-bold" id="topics-count">20 موضوعاً</span>
+                    </div>
+                    
+                    <div id="topics-container" class="space-y-2.5 overflow-y-auto max-h-[460px] pr-1">
+                        <p class="text-xs text-gray-500 text-center py-8">جاري سحب بنك الأخبار الحية...</p>
+                    </div>
+                </div>
+
             </div>
 
-        </div>
-
-        <!-- Character Archetypes & Script Preview Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            
-            <!-- Character Archetypes Showcase -->
+            <!-- Live Satirical Scripts Section -->
             <div class="bg-gray-900 border border-gray-800 rounded-xl p-5 flex flex-col">
-                <h2 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
-                    🎭 شخصيات القناة الذكية (حسب سياق الخبر)
-                </h2>
-                <div class="grid grid-cols-2 gap-3 text-center">
-                    <div class="bg-gray-950 p-2.5 rounded-lg border border-gray-800/80 flex flex-col items-center">
-                        <img src="output/characters/ba_rahal_farmer.jpg" alt="با رحال" class="w-14 h-14 rounded-full object-cover border-2 border-amber-500 mb-1.5">
-                        <span class="text-xs font-bold text-amber-300">با رحال</span>
-                        <span class="text-[10px] text-gray-400">الفلاح (أخبار الفلاحة والجفاف)</span>
-                    </div>
-                    <div class="bg-gray-950 p-2.5 rounded-lg border border-gray-800/80 flex flex-col items-center">
-                        <img src="output/characters/moul_taxi.jpg" alt="مول الطاكسي" class="w-14 h-14 rounded-full object-cover border-2 border-amber-500 mb-1.5">
-                        <span class="text-xs font-bold text-amber-300">مول الطاكسي</span>
-                        <span class="text-[10px] text-gray-400">سائق (المحروقات والطرق)</span>
-                    </div>
-                    <div class="bg-gray-950 p-2.5 rounded-lg border border-gray-800/80 flex flex-col items-center">
-                        <img src="output/characters/moul_hanout.jpg" alt="مول الحانوت" class="w-14 h-14 rounded-full object-cover border-2 border-amber-500 mb-1.5">
-                        <span class="text-xs font-bold text-amber-300">مول الحانوت</span>
-                        <span class="text-[10px] text-gray-400">تاجر (الأسعار والتضخم)</span>
-                    </div>
-                    <div class="bg-gray-950 p-2.5 rounded-lg border border-gray-800/80 flex flex-col items-center">
-                        <img src="output/characters/official_minister.jpg" alt="المسؤول" class="w-14 h-14 rounded-full object-cover border-2 border-blue-500 mb-1.5">
-                        <span class="text-xs font-bold text-blue-300">المسؤول</span>
-                        <span class="text-[10px] text-gray-400">المسؤول (كيبرّد الطرح والوعود)</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Satirical Scripts Live Stream -->
-            <div class="md:col-span-2 bg-gray-900 border border-gray-800 rounded-xl p-5 flex flex-col">
-                <div class="flex items-center justify-between mb-3 border-b border-gray-800 pb-2.5">
+                <div class="flex items-center justify-between mb-4 border-b border-gray-800 pb-3">
                     <div>
                         <h2 class="text-sm font-bold text-white flex items-center gap-2">
                             📝 سيناريوهات الحلقات اليومية بالدارجة الساخرة
                         </h2>
-                        <p class="text-xs text-gray-400">حوارات كوميدية ذكية بين صوت المواطن ورد المسؤول</p>
+                        <p class="text-xs text-gray-400">حوارات كوميدية ذكية متناوبة بين صوت المواطن ورد المسؤول الحكومي</p>
                     </div>
                 </div>
-                <div id="scripts-container" class="space-y-3 overflow-y-auto max-h-[280px] pr-1">
+                <div id="scripts-container" class="space-y-3 overflow-y-auto max-h-[350px] pr-1">
                     <p class="text-xs text-gray-500 text-center py-6">جاري تحميل السيناريوهات اليومية...</p>
                 </div>
             </div>
 
+        </div>
+
+        <!-- ================= TAB 2: GALLERY ================= -->
+        <div id="tab-content-gallery" class="tab-content hidden space-y-6">
+            <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
+                <div class="flex items-center justify-between mb-4 border-b border-gray-800 pb-3">
+                    <div>
+                        <h2 class="text-base font-bold text-white flex items-center gap-2">
+                            🎬 مكتبة الحلقات المكتملة والأرشيف
+                        </h2>
+                        <p class="text-xs text-gray-400">استعراض ومشاهدة كافة الحلقات المنتجة بدقة 1080x1920 الجاهزة للتنزيل والنشر</p>
+                    </div>
+                </div>
+
+                <div id="gallery-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Populated dynamically via /api/gallery -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= TAB 3: CHARACTERS ================= -->
+        <div id="tab-content-characters" class="tab-content hidden space-y-6">
+            <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
+                <div class="flex items-center justify-between mb-4 border-b border-gray-800 pb-3">
+                    <div>
+                        <h2 class="text-base font-bold text-white flex items-center gap-2">
+                            🎭 شخصيات القناة الذكية ومطابقة الأصوات (Gender Formants)
+                        </h2>
+                        <p class="text-xs text-gray-400">كل شخصية تمتلك صورة بفم مغلق جاهز للنطق، ونبرة صوت خاصة بها (ذكورية / أنثوية)</p>
+                    </div>
+                </div>
+
+                <div id="characters-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <!-- Populated dynamically via /api/characters -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= TAB 4: SCHEDULE ================= -->
+        <div id="tab-content-schedule" class="tab-content hidden space-y-6">
+            <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
+                <div class="flex items-center justify-between mb-4 border-b border-gray-800 pb-3">
+                    <div>
+                        <h2 class="text-base font-bold text-white flex items-center gap-2">
+                            ⏰ جدول النشر ومواعيد الذروة بالمغرب (Posting Schedule)
+                        </h2>
+                        <p class="text-xs text-gray-400">أوقات النشر المثلى حسب التوقيت المغربي لضمان أعلى نسبة وصول ومشاهدات (FYP)</p>
+                    </div>
+                </div>
+
+                <div id="schedule-container" class="space-y-3">
+                    <!-- Populated dynamically via /api/schedule -->
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= TAB 5: SYSTEM HEALTH ================= -->
+        <div id="tab-content-health" class="tab-content hidden space-y-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
+                    <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                        🛡️ استراتيجية التدفئة وتفادي الحظر (Anti-Shadowban Roadmap)
+                    </h3>
+                    <div class="space-y-3 text-xs text-gray-300">
+                        <div class="p-3 bg-emerald-950/40 border border-emerald-800/60 rounded-lg">
+                            <strong class="text-emerald-400 block mb-1">المرحلة الحالية: WARM_UP_P1 (الأيام 1 إلى 3)</strong>
+                            <p>نشر فيديو واحد يومياً فقط في وقت الذروة (20:30) مع فترات تفاعل يدوية لمدة 15 دقيقة لبناء ثقة الخوارزمية.</p>
+                        </div>
+                        <div class="p-3 bg-gray-950/60 border border-gray-800 rounded-lg">
+                            <strong class="text-amber-400 block mb-1">المرحلة 2: WARM_UP_P2 (الأيام 4 إلى 7)</strong>
+                            <p>زيادة تدريجية إلى 3 فيديوهات يومياً متباعدة بفارق 4 ساعات على الأقل.</p>
+                        </div>
+                        <div class="p-3 bg-gray-950/60 border border-gray-800 rounded-lg">
+                            <strong class="text-blue-400 block mb-1">المرحلة 3: GROWTH (الأيام 8 إلى 14)</strong>
+                            <p>التوسع إلى 6 إلى 8 فيديوهات يومياً مع تحليل أفضل المواضيع تفاعلاً.</p>
+                        </div>
+                        <div class="p-3 bg-gray-950/60 border border-gray-800 rounded-lg">
+                            <strong class="text-purple-400 block mb-1">المرحلة 4: SCALING (اليوم 15 فما فوق)</strong>
+                            <p>الإنتاج المصنعي الكامل: 20 حلقة يومياً على مدار 24 ساعة بمعدل حلقة كل 45 دقيقة.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
+                    <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
+                        ⚙️ مؤشرات المحركات والخدمات المجانية
+                    </h3>
+                    <div class="space-y-3 text-xs">
+                        <div class="flex items-center justify-between p-3 bg-gray-950/60 border border-gray-800 rounded-lg">
+                            <div>
+                                <strong class="text-white block">مكتبة Hugging Face ZeroGPU</strong>
+                                <span class="text-gray-400">توليد حركة الشفاه العصبية (Wav2Lip)</span>
+                            </div>
+                            <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded text-[11px] font-bold">نشط 🟢</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-950/60 border border-gray-800 rounded-lg">
+                            <div>
+                                <strong class="text-white block">محرك الأصوات RubberBand & FFmpeg</strong>
+                                <span class="text-gray-400">توليد الأصوات الذكورية والأنثوية مجاناً بدون حدود</span>
+                            </div>
+                            <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded text-[11px] font-bold">100% محلي مجاني 🟢</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-950/60 border border-gray-800 rounded-lg">
+                            <div>
+                                <strong class="text-white block">استضافة Vercel Serverless</strong>
+                                <span class="text-gray-400">لوحة التحكم ومزامنة واجهات الـ API</span>
+                            </div>
+                            <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded text-[11px] font-bold">200 OK 🟢</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-950/60 border border-gray-800 rounded-lg">
+                            <div>
+                                <strong class="text-white block">سيرفر GitHub Actions</strong>
+                                <span class="text-gray-400">مجدول يومي آلي (Cron Trigger)</span>
+                            </div>
+                            <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded text-[11px] font-bold">نشط 🟢</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Automation Controls & GitHub Links -->
@@ -172,10 +292,10 @@
             </div>
             <div class="flex flex-wrap gap-2.5 shrink-0">
                 <a href="https://github.com/slimanix/morocco-tiktok-studio/actions/workflows/daily_tiktok_factory.yml" target="_blank" class="text-xs bg-red-600 hover:bg-red-500 text-white font-bold px-4 py-2 rounded-lg transition shadow-lg shadow-red-950/50 flex items-center gap-1.5">
-                    <span>تشغيل حلقة فورية ⚡</span>
+                    <span>تشغيل سيرفر الإنتاج ⚡</span>
                 </a>
                 <a href="https://github.com/slimanix/morocco-tiktok-studio/actions" target="_blank" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-200 font-bold px-4 py-2 rounded-lg border border-gray-700 transition flex items-center gap-1.5">
-                    <span>تحميل الفيديوهات (Artifacts) 📥</span>
+                    <span>تحميل الفيديوهات السحابية 📥</span>
                 </a>
             </div>
         </div>
@@ -188,6 +308,23 @@
 
     <script>
         const GITHUB_RAW_BASE = "https://raw.githubusercontent.com/slimanix/morocco-tiktok-studio/main";
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('bg-red-600', 'text-white');
+                el.classList.add('bg-gray-800/70', 'text-gray-300');
+            });
+
+            const activeContent = document.getElementById(`tab-content-${tabId}`);
+            if (activeContent) activeContent.classList.remove('hidden');
+
+            const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+            if (activeBtn) {
+                activeBtn.classList.remove('bg-gray-800/70', 'text-gray-300');
+                activeBtn.classList.add('bg-red-600', 'text-white');
+            }
+        }
 
         async function fetchWithFallback(endpoint, rawPath) {
             try {
@@ -206,6 +343,10 @@
             return null;
         }
 
+        function triggerImmediateRun() {
+            window.open("https://github.com/slimanix/morocco-tiktok-studio/actions/workflows/daily_tiktok_factory.yml", "_blank");
+        }
+
         async function refreshDashboard() {
             try {
                 // 1. Account State
@@ -217,11 +358,12 @@
                 // 2. Daily Topics
                 const topics = await fetchWithFallback('/api/topics', 'output/daily_topics.json');
                 if (Array.isArray(topics) && topics.length > 0) {
+                    document.getElementById('topics-count').innerText = `${topics.length} موضوعاً`;
                     const container = document.getElementById('topics-container');
                     container.innerHTML = topics.map((t, idx) => `
                         <div class="p-3 bg-gray-950/70 rounded-lg border border-gray-800/80 hover:border-gray-700 transition flex items-start gap-2.5">
                             <span class="text-[11px] font-bold bg-gray-800 text-gray-300 w-5 h-5 rounded flex items-center justify-center shrink-0 mt-0.5">${idx+1}</span>
-                            <div>
+                            <div class="flex-1">
                                 <p class="text-xs font-semibold text-gray-200">${t.title}</p>
                                 <span class="text-[10px] text-amber-400 mt-1 inline-block">[${t.category} • خبر اليوم]</span>
                             </div>
@@ -234,19 +376,79 @@
                 if (Array.isArray(scripts) && scripts.length > 0) {
                     const scrContainer = document.getElementById('scripts-container');
                     scrContainer.innerHTML = scripts.slice(0, 5).map((s, idx) => `
-                        <div class="p-3 bg-gray-950/80 rounded-lg border border-gray-800/90 text-right">
+                        <div class="p-3.5 bg-gray-950/80 rounded-lg border border-gray-800/90 text-right">
                             <div class="flex items-center justify-between mb-2">
                                 <span class="text-xs font-bold text-red-400">حلقة ${s.episode_id}: ${s.headline}</span>
-                                <span class="text-[10px] bg-gray-800 text-gray-400 px-2 py-0.5 rounded">دارجة مغربية</span>
+                                <span class="text-[10px] bg-gray-800 text-gray-400 px-2 py-0.5 rounded">دارجة مغربية ساخرة</span>
                             </div>
                             <div class="space-y-1.5 text-xs text-gray-300">
-                                ${s.dialogue.slice(0, 3).map(d => `
+                                ${s.dialogue.slice(0, 4).map(d => `
                                     <p class="leading-relaxed"><strong class="${d.speaker.includes('المواطن') ? 'text-amber-400' : 'text-blue-400'}">${d.speaker}:</strong> ${d.text}</p>
                                 `).join('')}
                             </div>
                         </div>
                     `).join('');
                 }
+
+                // 4. Characters
+                const chars = await fetchWithFallback('/api/characters', 'output/characters_data.json');
+                if (Array.isArray(chars) && chars.length > 0) {
+                    const charContainer = document.getElementById('characters-container');
+                    charContainer.innerHTML = chars.map(c => `
+                        <div class="p-4 bg-gray-950/80 border border-gray-800/80 rounded-xl flex items-start gap-3.5 hover:border-gray-700 transition">
+                            <img src="${c.image}" alt="${c.name}" class="w-16 h-16 rounded-xl object-cover border-2 border-${c.badge_color}-500 shrink-0 shadow-md">
+                            <div class="flex-1">
+                                <div class="flex items-center justify-between">
+                                    <h4 class="text-xs font-bold text-white">${c.name}</h4>
+                                    <span class="text-[10px] bg-gray-800 text-${c.badge_color}-400 px-2 py-0.5 rounded font-semibold">${c.gender}</span>
+                                </div>
+                                <p class="text-[11px] text-gray-400 mt-1">${c.role}</p>
+                                <p class="text-[10px] text-gray-500 mt-1 line-clamp-2"><strong>المواضيع:</strong> ${c.topics}</p>
+                                <span class="text-[10px] text-emerald-400 mt-1.5 inline-block font-mono">🎙️ ${c.voice_type}</span>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
+                // 5. Schedule
+                const sched = await fetchWithFallback('/api/schedule', 'output/daily_schedule.json');
+                if (Array.isArray(sched) && sched.length > 0) {
+                    const schedContainer = document.getElementById('schedule-container');
+                    schedContainer.innerHTML = sched.map(s => `
+                        <div class="p-3.5 bg-gray-950/80 border border-gray-800/80 rounded-xl flex items-center justify-between hover:border-gray-700 transition">
+                            <div class="flex items-center gap-3">
+                                <span class="text-sm font-black text-amber-400 font-mono bg-gray-900 px-3 py-1.5 rounded-lg border border-gray-800">${s.time}</span>
+                                <div>
+                                    <h4 class="text-xs font-bold text-white">${s.headline}</h4>
+                                    <p class="text-[11px] text-gray-400">${s.slot} • ${s.character}</p>
+                                </div>
+                            </div>
+                            <span class="text-[11px] font-bold px-2.5 py-1 rounded-full border ${s.badge}">${s.status}</span>
+                        </div>
+                    `).join('');
+                }
+
+                // 6. Gallery
+                const gallery = await fetchWithFallback('/api/gallery', 'output/episodes_gallery.json');
+                if (Array.isArray(gallery) && gallery.length > 0) {
+                    const gallContainer = document.getElementById('gallery-container');
+                    gallContainer.innerHTML = gallery.map(g => `
+                        <div class="bg-gray-950 border border-gray-800 rounded-xl overflow-hidden flex flex-col p-3 hover:border-gray-700 transition">
+                            <div class="aspect-[9/16] bg-black rounded-lg overflow-hidden border border-gray-850 relative mb-3">
+                                <video controls class="w-full h-full object-contain" preload="none">
+                                    <source src="${g.video_src}" type="video/mp4">
+                                </video>
+                            </div>
+                            <h4 class="text-xs font-bold text-white">${g.title}</h4>
+                            <p class="text-[10px] text-gray-400 mt-0.5">${g.characters}</p>
+                            <div class="flex items-center justify-between mt-2 pt-2 border-t border-gray-800 text-[10px] text-gray-500">
+                                <span>⏱️ ${g.duration}</span>
+                                <span class="text-emerald-400 font-semibold">${g.badge}</span>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+
             } catch (err) {
                 console.error("Dashboard sync error:", err);
             }

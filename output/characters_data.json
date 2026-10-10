@@ -1,0 +1,72 @@
+[
+  {
+    "id": "moul_taxi",
+    "name": "مول الطاكسي (كازا)",
+    "gender": "ذكر (رجولي حاد)",
+    "role": "سائق طاكسي أحمر",
+    "topics": "المحروقات، الطرقات، رخص الثقة، لوم المسؤول",
+    "image": "output/characters/moul_taxi.jpg",
+    "voice_type": "Masculine Energetic",
+    "badge_color": "amber"
+  },
+  {
+    "id": "official_minister",
+    "name": "المسؤول الحكومي",
+    "gender": "ذكر (صوت رخيم بارد)",
+    "role": "المسؤول (كيبرّد الطرح)",
+    "topics": "تبرير الزيادات، لغة الخشب، التوازن المالي، المخططات",
+    "image": "output/characters/official_minister.jpg",
+    "voice_type": "Bureaucratic Baritone",
+    "badge_color": "blue"
+  },
+  {
+    "id": "mi_aicha",
+    "name": "مي عيشة (ربة بيت)",
+    "gender": "أنثى (صوت نقي معبر)",
+    "role": "المواطنة في السوق الأسبوعي",
+    "topics": "قفة رمضان، مطيشة، البصلة، الغلاء المعيشي",
+    "image": "output/characters/mi_aicha_housewife.jpg",
+    "voice_type": "Feminine Expressive",
+    "badge_color": "rose"
+  },
+  {
+    "id": "moul_hanout",
+    "name": "مول الحانوت (سوس)",
+    "gender": "ذكر (حسابات وكناش)",
+    "role": "تاجر القرب والمواد الغذائية",
+    "topics": "كريدي الكناش، فواتير التوريد، الزيادات من الشركات",
+    "image": "output/characters/moul_hanout.jpg",
+    "voice_type": "Masculine Commercial",
+    "badge_color": "emerald"
+  },
+  {
+    "id": "ba_rahal",
+    "name": "با رحال (الفلاح)",
+    "gender": "ذكر (بدوي أصيل)",
+    "role": "فلاح من البادية",
+    "topics": "الجفاف، العلف، أسعار الأبقار، تساقطات المطر",
+    "image": "output/characters/ba_rahal_farmer.jpg",
+    "voice_type": "Masculine Earthy",
+    "badge_color": "yellow"
+  },
+  {
+    "id": "oustad_teacher",
+    "name": "الأستاذ (رجل التعليم)",
+    "gender": "ذكر (مثقف صبور)",
+    "role": "أستاذ المدرسة العمومية",
+    "topics": "التعليم، النظام الأساسي، الاكتظاظ، الامتحانات",
+    "image": "output/characters/oustad_teacher.jpg",
+    "voice_type": "Masculine Educated",
+    "badge_color": "indigo"
+  },
+  {
+    "id": "tabib_doctor",
+    "name": "طبيب المستعجلات",
+    "gender": "ذكر (طبيب متعب)",
+    "role": "طبيب قطاع الصحة",
+    "topics": "المستشفيات، نقص الأدوية، التغطية الصحية AMO",
+    "image": "output/characters/tabib_doctor.jpg",
+    "voice_type": "Masculine Professional",
+    "badge_color": "teal"
+  }
+]
