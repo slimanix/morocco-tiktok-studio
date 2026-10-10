@@ -12,3 +12,5 @@ output/lipsync_parts/
 output/frames/
 *.raw.mp3
 output/*TEMP_MPY*
+
+.vercel
