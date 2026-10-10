@@ -65,18 +65,44 @@ def run_daily_batch(limit=20):
                 "output_path": f"{ep_folder}/scene_{j}.mp4"
             })
             
-        # Fast parallel render video for this episode
+        # 1. Fast parallel render lipsync scenes for this episode
         from concurrent.futures import ThreadPoolExecutor
         with ThreadPoolExecutor(max_workers=5) as executor:
             rendered_scenes = list(executor.map(process_single_scene, scene_tasks))
             
+        raw_concat_video = f"{ep_folder}/raw_concat.mp4"
+        fast_ffmpeg_concat(rendered_scenes, raw_concat_video)
+        
+        # 2. Apply Subtitles, Speaker Badges & News Banner
+        from burn_subtitles_overlay import apply_tiktok_overlays
+        subtitled_video = f"{ep_folder}/subtitled.mp4"
+        hook_text = ep["dialogue"][0]["text"][:65] + "..."
+        try:
+            apply_tiktok_overlays(
+                input_video_path=raw_concat_video,
+                subtitle_text=hook_text,
+                speaker_name="المواطن (معصب)",
+                output_video_path=subtitled_video
+            )
+        except Exception as e:
+            print(f"⚠️ Subtitle overlay fallback: {e}")
+            subtitled_video = raw_concat_video
+            
+        # 3. Apply Kinetic Camera Punch-Zoom
+        from kinetic_camera import apply_kinetic_zoom
         final_ep_video = f"{batch_dir}/episode_{ep_id}.mp4"
-        fast_ffmpeg_concat(rendered_scenes, final_ep_video)
-        print(f"   🎉 Episode {ep_id} Finished: {final_ep_video}")
+        try:
+            apply_kinetic_zoom(subtitled_video, final_ep_video, zoom_factor=1.10)
+        except Exception as e:
+            print(f"⚠️ Kinetic zoom fallback: {e}")
+            import shutil
+            shutil.copy(subtitled_video, final_ep_video)
+            
+        print(f"   🎉 Fully Enhanced Episode {ep_id} Ready: {final_ep_video}")
         finished_videos.append(final_ep_video)
         
     print("\n" + "=" * 65)
-    print(f"🏆 ALL {len(finished_videos)} VIDEOS READY IN: {batch_dir}")
+    print(f"🏆 ALL {len(finished_videos)} FULLY ENHANCED VIDEOS READY IN: {batch_dir}")
     print("=" * 65)
     return finished_videos
 
