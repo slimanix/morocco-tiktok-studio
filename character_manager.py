@@ -10,22 +10,26 @@ if sys.platform == "win32":
 CHARACTERS_DIR = "output/characters"
 
 KEYWORD_MAP = {
+    "housewife": ["قفة", "سوق", "معيشة", "خضار", "مطيشة", "بصلة", "أسر", "أرامل", "دعم", "غلاء المعيشة", "حساء"],
     "farmer": ["حليب", "أبقار", "فلاحة", "فلاح", "قمح", "شعير", "جفاف", "زيتون"],
     "taxi": ["مازوط", "بترول", "غازوال", "طاكسي", "نقل", "طوموبيل", "سيارات", "محروقات", "طرق"],
-    "grocer": ["أسعار", "غلاء", "درهم", "تضخم", "زيت", "سكر", "مواد", "معيشة", "تمويل", "ذهب"],
+    "grocer": ["أسعار", "غلاء", "درهم", "تضخم", "زيت", "سكر", "مواد", "تمويل", "ذهب"],
     "teacher": ["تعليم", "أساتذة", "أستاذ", "مدارس", "تلاميذ", "إضراب", "جامعة"],
     "doctor": ["صحة", "مستشفيات", "أدوية", "مرضى", "صرع", "أطباء", "صيدليات", "غاردينال"]
 }
 
 FILE_MAP = {
+    "housewife": f"{CHARACTERS_DIR}/mi_aicha_housewife.jpg",
     "farmer": f"{CHARACTERS_DIR}/ba_rahal_farmer.jpg",
     "taxi": f"{CHARACTERS_DIR}/moul_taxi.jpg",
     "grocer": f"{CHARACTERS_DIR}/moul_hanout.jpg",
     "teacher": f"{CHARACTERS_DIR}/oustad_teacher.jpg",
+    "doctor": f"{CHARACTERS_DIR}/tabib_doctor.jpg",
     "minister": f"{CHARACTERS_DIR}/official_minister.jpg"
 }
 
 ROLE_LABELS = {
+    "housewife": "مي عيشة (ربة بيت)",
     "farmer": "با رحال (الفلاح)",
     "taxi": "مول الطاكسي",
     "grocer": "مول الحانوت",
@@ -34,10 +38,21 @@ ROLE_LABELS = {
     "citizen": "المواطن (معصب)"
 }
 
+ROLE_GENDERS = {
+    "housewife": "female",
+    "farmer": "male",
+    "taxi": "male",
+    "grocer": "male",
+    "teacher": "male",
+    "doctor": "male",
+    "minister": "male",
+    "citizen": "male"
+}
+
 def get_or_generate_character_for_topic(headline):
     """
-    Picks the best existing character and badge label, or auto-generates a brand-new one 100% free!
-    Returns: (image_path, label)
+    Picks the best existing character, badge label, and GENDER (male/female).
+    Returns: (image_path, label, gender)
     """
     os.makedirs(CHARACTERS_DIR, exist_ok=True)
     
@@ -48,20 +63,18 @@ def get_or_generate_character_for_topic(headline):
                 matched_file = FILE_MAP.get(role)
                 if matched_file and os.path.exists(matched_file):
                     label = ROLE_LABELS.get(role, "المواطن (معصب)")
-                    print(f"🎭 Matched archetype [{role}: {label}] for topic: '{headline[:30]}...'")
-                    return matched_file, label
+                    gender = ROLE_GENDERS.get(role, "male")
+                    print(f"🎭 Matched archetype [{role}: {label} | Gender: {gender}] for topic: '{headline[:30]}...'")
+                    return matched_file, label, gender
                     
-    # 2. If it's a doctor/health topic and we don't have it yet, auto-generate for free!
+    # 2. If it's a doctor/health topic
     if any(k in headline for k in KEYWORD_MAP.get("doctor", [])):
-        dest = f"{CHARACTERS_DIR}/tabib_doctor.jpg"
-        if not os.path.exists(dest):
-            print("🎨 Auto-generating brand-new [Doctor] character for 100% free...")
-            generate_free_character("funny stressed Moroccan doctor in white coat with stethoscope, hospital emergency background", dest)
-        return dest, ROLE_LABELS["doctor"]
+        dest = FILE_MAP["doctor"]
+        return dest, ROLE_LABELS["doctor"], "male"
         
-    # Default citizen
+    # Default citizen: Moul Taxi (Male)
     fallback_file = FILE_MAP["taxi"] if os.path.exists(FILE_MAP["taxi"]) else FILE_MAP["grocer"]
-    return fallback_file, ROLE_LABELS["taxi"]
+    return fallback_file, ROLE_LABELS["taxi"], "male"
 
 def generate_free_character(description, output_path):
     """Generates any brand-new character on the fly 100% free with Pollinations."""
