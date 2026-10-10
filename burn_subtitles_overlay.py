@@ -14,9 +14,23 @@ try:
 except ImportError:
     from moviepy.editor import VideoFileClip, VideoClip
 
-ARABIC_FONT_PATH = "C:/Windows/Fonts/arialbd.ttf"
-if not os.path.exists(ARABIC_FONT_PATH):
-    ARABIC_FONT_PATH = "C:/Windows/Fonts/arial.ttf"
+def get_arabic_font(size):
+    font_candidates = [
+        os.path.join(os.path.dirname(__file__), "fonts", "NotoSansArabic.ttf"),
+        "fonts/NotoSansArabic.ttf",
+        "/usr/share/fonts/truetype/noto/NotoSansArabic-Bold.ttf",
+        "/usr/share/fonts/truetype/noto/NotoSansArabic-Regular.ttf",
+        "C:/Windows/Fonts/arialbd.ttf",
+        "C:/Windows/Fonts/arial.ttf",
+        "C:/Windows/Fonts/segoeui.ttf",
+    ]
+    for path in font_candidates:
+        if os.path.exists(path):
+            try:
+                return ImageFont.truetype(path, size)
+            except Exception:
+                pass
+    return ImageFont.load_default()
 
 def reshape_arabic(text):
     try:
@@ -25,7 +39,7 @@ def reshape_arabic(text):
     except Exception:
         return text
 
-def apply_tiktok_overlays(input_video_path, subtitle_text, speaker_name, output_video_path):
+def apply_tiktok_overlays(input_video_path, subtitle_text, speaker_name, output_video_path, banner_title="عاجل | نقاش وطني حول الأخبار اليومية 🇲🇦"):
     """
     Overlays breaking news banner, speaker badge, and bold RTL Arabic subtitles
     directly onto a lip-synced video clip.
@@ -34,15 +48,26 @@ def apply_tiktok_overlays(input_video_path, subtitle_text, speaker_name, output_
     source_clip = VideoFileClip(input_video_path)
     width, height = source_clip.size
     
-    font_sub = ImageFont.truetype(ARABIC_FONT_PATH, int(height * 0.038))
-    font_badge = ImageFont.truetype(ARABIC_FONT_PATH, int(height * 0.030))
-    font_banner = ImageFont.truetype(ARABIC_FONT_PATH, int(height * 0.025))
+    font_sub = get_arabic_font(int(height * 0.034))
+    font_badge = get_arabic_font(int(height * 0.028))
+    font_banner = get_arabic_font(int(height * 0.022))
     
-    reshaped_sub = reshape_arabic(subtitle_text)
-    reshaped_speaker = reshape_arabic(f"🔴 {speaker_name}")
-    reshaped_banner = reshape_arabic("عاجل | نقاش وطني حول الأخبار اليومية 🇲🇦")
+    reshaped_speaker = reshape_arabic(speaker_name)
+    reshaped_banner = reshape_arabic(banner_title[:45])
     
-    badge_color = (255, 180, 0) if "المواطن" in speaker_name else (0, 140, 255)
+    # Official = Blue, All Citizen Archetypes (Taxi, Grocer, Farmer, etc.) = Amber Gold
+    is_official = "المسؤول" in speaker_name or "وزير" in speaker_name
+    badge_color = (0, 140, 255) if is_official else (255, 185, 20)
+    
+    # Subtitle splitting for long lines
+    words = subtitle_text.split()
+    if len(words) > 7:
+        mid = len(words) // 2
+        line1 = reshape_arabic(" ".join(words[:mid]))
+        line2 = reshape_arabic(" ".join(words[mid:]))
+        sub_lines = [line1, line2]
+    else:
+        sub_lines = [reshape_arabic(subtitle_text)]
     
     def transform_frame(get_frame, t):
         frame = get_frame(t)
@@ -50,29 +75,39 @@ def apply_tiktok_overlays(input_video_path, subtitle_text, speaker_name, output_
         draw = ImageDraw.Draw(img)
         
         # 1. Top Breaking News Banner
-        banner_h = int(height * 0.05)
+        banner_h = int(height * 0.052)
         draw.rectangle([0, 0, width, banner_h], fill=(210, 20, 20))
         draw.text((width // 2, banner_h // 2), reshaped_banner, font=font_banner, fill="white", anchor="mm")
         
         # 2. Speaker Badge
         badge_y = int(height * 0.10)
-        bw, bh = int(width * 0.25), int(height * 0.022)
+        bw, bh = int(width * 0.28), int(height * 0.024)
         draw.rounded_rectangle([width // 2 - bw, badge_y - bh, width // 2 + bw, badge_y + bh], radius=15, fill=badge_color)
-        draw.text((width // 2, badge_y), reshaped_speaker, font=font_badge, fill="black", anchor="mm")
+        
+        # Live red pulse dot inside badge
+        dot_r = int(height * 0.006)
+        draw.ellipse([width // 2 + bw - 28, badge_y - dot_r, width // 2 + bw - 28 + dot_r * 2, badge_y + dot_r], fill=(220, 30, 30))
+        
+        draw.text((width // 2 - 8, badge_y), reshaped_speaker, font=font_badge, fill="black", anchor="mm")
         
         # 3. Bottom TikTok Subtitle Box
-        sub_y = int(height * 0.88)
-        box_w, box_h = int(width * 0.45), int(height * 0.045)
-        draw.rounded_rectangle([width // 2 - box_w, sub_y - box_h, width // 2 + box_w, sub_y + box_h], radius=20, fill=(0, 0, 0, 210))
-        draw.text((width // 2, sub_y), reshaped_sub, font=font_sub, fill=(255, 240, 50), anchor="mm")
+        sub_y = int(height * 0.86)
+        box_w = int(width * 0.46)
+        box_h = int(height * 0.038) * len(sub_lines)
+        draw.rounded_rectangle([width // 2 - box_w, sub_y - box_h // 2 - 8, width // 2 + box_w, sub_y + box_h // 2 + 8], radius=18, fill=(0, 0, 0, 210))
+        
+        if len(sub_lines) == 1:
+            draw.text((width // 2, sub_y), sub_lines[0], font=font_sub, fill=(255, 240, 50), anchor="mm")
+        else:
+            spacing = int(height * 0.038)
+            draw.text((width // 2, sub_y - spacing // 2), sub_lines[0], font=font_sub, fill=(255, 240, 50), anchor="mm")
+            draw.text((width // 2, sub_y + spacing // 2), sub_lines[1], font=font_sub, fill=(255, 240, 50), anchor="mm")
         
         return np.array(img)
 
     try:
-        # MoviePy 2.x
         final_clip = source_clip.transform(transform_frame)
     except AttributeError:
-        # MoviePy 1.x
         final_clip = source_clip.fl(transform_frame)
         
     final_clip.write_videofile(
@@ -83,6 +118,9 @@ def apply_tiktok_overlays(input_video_path, subtitle_text, speaker_name, output_
         preset="ultrafast",
         threads=4
     )
+    
+    source_clip.close()
+    final_clip.close()
     print(f"✅ Finished overlay: {output_video_path}")
     return output_video_path
 

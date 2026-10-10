@@ -1,6 +1,30 @@
 import os
 import json
+import urllib.request
 from http.server import BaseHTTPRequestHandler
+
+GITHUB_RAW_BASE = "https://raw.githubusercontent.com/slimanix/morocco-tiktok-studio/main"
+
+def fetch_live_json(rel_path, default_val):
+    # 1. Fetch live from GitHub repository with cache buster
+    try:
+        url = f"{GITHUB_RAW_BASE}/{rel_path}?nocache={os.urandom(4).hex()}"
+        req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 (Vercel Dashboard)"})
+        with urllib.request.urlopen(req, timeout=3.5) as resp:
+            if resp.status == 200:
+                return json.loads(resp.read().decode("utf-8"))
+    except Exception:
+        pass
+        
+    # 2. Fallback to local file in container
+    if os.path.exists(rel_path):
+        try:
+            with open(rel_path, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            pass
+            
+    return default_val
 
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -10,22 +34,27 @@ class handler(BaseHTTPRequestHandler):
         if clean_path == "/api/state":
             self.send_response(200)
             self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
             self.end_headers()
-            data = {}
-            if os.path.exists("output/account_state.json"):
-                with open("output/account_state.json", "r", encoding="utf-8") as f:
-                    data = json.load(f)
+            data = fetch_live_json("output/account_state.json", {})
             self.wfile.write(json.dumps(data, ensure_ascii=False).encode("utf-8"))
             return
             
         elif clean_path == "/api/topics":
             self.send_response(200)
             self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
             self.end_headers()
-            data = []
-            if os.path.exists("output/daily_topics.json"):
-                with open("output/daily_topics.json", "r", encoding="utf-8") as f:
-                    data = json.load(f)
+            data = fetch_live_json("output/daily_topics.json", [])
+            self.wfile.write(json.dumps(data, ensure_ascii=False).encode("utf-8"))
+            return
+            
+        elif clean_path == "/api/scripts":
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
+            self.end_headers()
+            data = fetch_live_json("output/daily_scripts.json", [])
             self.wfile.write(json.dumps(data, ensure_ascii=False).encode("utf-8"))
             return
 

@@ -10,6 +10,8 @@ tiktok_session/
 # Temporary video parts
 output/lipsync_parts/
 output/frames/
+output/batch_*/ep_*/
+output/sample_*.jpg
 *.raw.mp3
 output/*TEMP_MPY*
 

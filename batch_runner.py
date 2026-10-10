@@ -43,8 +43,9 @@ def run_daily_batch(limit=20):
         
         # Select or auto-generate contextual character for this news headline
         from character_manager import get_or_generate_character_for_topic
-        citizen_char = get_or_generate_character_for_topic(headline)
+        citizen_char, citizen_label = get_or_generate_character_for_topic(headline)
         official_char = "output/characters/official_minister.jpg"
+        official_label = "المسؤول (كيبرّد الطرح)"
         
         # Audio synthesis for each line
         scene_tasks = []
@@ -56,47 +57,66 @@ def run_daily_batch(limit=20):
             # Synthesize audio with multi-provider voice engine
             synthesize_audio(text, speaker_type, audio_out)
             
-            img_target = citizen_char if "المواطن" in speaker_type else official_char
+            is_citizen = "المواطن" in speaker_type
+            img_target = citizen_char if is_citizen else official_char
+            badge = citizen_label if is_citizen else official_label
+            
             scene_tasks.append({
                 "id": j,
                 "speaker": part["speaker"],
+                "speaker_badge": badge,
+                "text": text,
                 "image": img_target,
                 "audio": audio_out,
-                "output_path": f"{ep_folder}/scene_{j}.mp4"
+                "output_path": f"{ep_folder}/raw_scene_{j}.mp4",
+                "enhanced_path": f"{ep_folder}/scene_{j}.mp4"
             })
             
         # 1. Fast parallel render lipsync scenes for this episode
         from concurrent.futures import ThreadPoolExecutor
-        with ThreadPoolExecutor(max_workers=5) as executor:
-            rendered_scenes = list(executor.map(process_single_scene, scene_tasks))
-            
-        raw_concat_video = f"{ep_folder}/raw_concat.mp4"
-        fast_ffmpeg_concat(rendered_scenes, raw_concat_video)
-        
-        # 2. Apply Subtitles, Speaker Badges & News Banner
         from burn_subtitles_overlay import apply_tiktok_overlays
-        subtitled_video = f"{ep_folder}/subtitled.mp4"
-        hook_text = ep["dialogue"][0]["text"][:65] + "..."
-        try:
-            apply_tiktok_overlays(
-                input_video_path=raw_concat_video,
-                subtitle_text=hook_text,
-                speaker_name="المواطن (معصب)",
-                output_video_path=subtitled_video
-            )
-        except Exception as e:
-            print(f"⚠️ Subtitle overlay fallback: {e}")
-            subtitled_video = raw_concat_video
+        
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            rendered_raw = list(executor.map(process_single_scene, scene_tasks))
             
-        # 3. Apply Kinetic Camera Punch-Zoom
+        # 2. Burn individual dynamic subtitles, badges & headline on each scene
+        enhanced_scenes = []
+        for task in scene_tasks:
+            raw_v = task["output_path"]
+            enh_v = task["enhanced_path"]
+            try:
+                apply_tiktok_overlays(
+                    input_video_path=raw_v,
+                    subtitle_text=task["text"],
+                    speaker_name=task["speaker_badge"],
+                    output_video_path=enh_v,
+                    banner_title=f"عاجل | {headline[:40]}"
+                )
+                enhanced_scenes.append(enh_v)
+            except Exception as e:
+                print(f"⚠️ Scene {task['id']} overlay fallback: {e}")
+                enhanced_scenes.append(raw_v)
+                
+        # 3. Fast assemble enhanced scenes into cohesive episode
+        raw_concat_video = f"{ep_folder}/raw_concat.mp4"
+        fast_ffmpeg_concat(enhanced_scenes, raw_concat_video)
+        
+        # 4. Apply Kinetic Camera Punch-Zoom
         from kinetic_camera import apply_kinetic_zoom
         final_ep_video = f"{batch_dir}/episode_{ep_id}.mp4"
         try:
-            apply_kinetic_zoom(subtitled_video, final_ep_video, zoom_factor=1.10)
+            apply_kinetic_zoom(raw_concat_video, final_ep_video, zoom_factor=1.10)
         except Exception as e:
             print(f"⚠️ Kinetic zoom fallback: {e}")
             import shutil
-            shutil.copy(subtitled_video, final_ep_video)
+            shutil.copy(raw_concat_video, final_ep_video)
+            
+        # 5. Keep preview showcase updated for dashboard
+        import shutil
+        try:
+            shutil.copy(final_ep_video, "output/test_official_with_subtitles.mp4")
+        except Exception:
+            pass
             
         print(f"   🎉 Fully Enhanced Episode {ep_id} Ready: {final_ep_video}")
         finished_videos.append(final_ep_video)

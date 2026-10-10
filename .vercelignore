@@ -1,0 +1,8 @@
+output/batch_*
+output/lipsync_parts/
+output/frames/
+*.mp3
+*.log
+.git
+.github
+tiktok_session/

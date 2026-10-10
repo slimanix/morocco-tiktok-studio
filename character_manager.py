@@ -25,9 +25,19 @@ FILE_MAP = {
     "minister": f"{CHARACTERS_DIR}/official_minister.jpg"
 }
 
+ROLE_LABELS = {
+    "farmer": "با رحال (الفلاح)",
+    "taxi": "مول الطاكسي",
+    "grocer": "مول الحانوت",
+    "teacher": "أستاذ محتج",
+    "doctor": "دكتور مستعجلات",
+    "citizen": "المواطن (معصب)"
+}
+
 def get_or_generate_character_for_topic(headline):
     """
-    Picks the best existing character, or auto-generates a brand-new one 100% free!
+    Picks the best existing character and badge label, or auto-generates a brand-new one 100% free!
+    Returns: (image_path, label)
     """
     os.makedirs(CHARACTERS_DIR, exist_ok=True)
     
@@ -37,8 +47,9 @@ def get_or_generate_character_for_topic(headline):
             if kw in headline:
                 matched_file = FILE_MAP.get(role)
                 if matched_file and os.path.exists(matched_file):
-                    print(f"🎭 Matched archetype [{role}] for topic: '{headline[:30]}...'")
-                    return matched_file
+                    label = ROLE_LABELS.get(role, "المواطن (معصب)")
+                    print(f"🎭 Matched archetype [{role}: {label}] for topic: '{headline[:30]}...'")
+                    return matched_file, label
                     
     # 2. If it's a doctor/health topic and we don't have it yet, auto-generate for free!
     if any(k in headline for k in KEYWORD_MAP.get("doctor", [])):
@@ -46,10 +57,11 @@ def get_or_generate_character_for_topic(headline):
         if not os.path.exists(dest):
             print("🎨 Auto-generating brand-new [Doctor] character for 100% free...")
             generate_free_character("funny stressed Moroccan doctor in white coat with stethoscope, hospital emergency background", dest)
-        return dest
+        return dest, ROLE_LABELS["doctor"]
         
     # Default citizen
-    return FILE_MAP["taxi"] if os.path.exists(FILE_MAP["taxi"]) else FILE_MAP["grocer"]
+    fallback_file = FILE_MAP["taxi"] if os.path.exists(FILE_MAP["taxi"]) else FILE_MAP["grocer"]
+    return fallback_file, ROLE_LABELS["taxi"]
 
 def generate_free_character(description, output_path):
     """Generates any brand-new character on the fly 100% free with Pollinations."""
