@@ -608,9 +608,33 @@
 
         function playCharacterAudio(audioSrc, charName) {
             const audio = document.getElementById('character-audio-player');
-            audio.src = audioSrc;
-            audio.play();
-            showToast(`تشغيل عينة صوت: ${charName}`);
+            const cleanPath = audioSrc.startsWith('http') ? audioSrc : `${window.location.origin}/${audioSrc}`;
+            const ghFallback = `${GITHUB_RAW_BASE}/${audioSrc}`;
+            
+            audio.src = cleanPath;
+            showToast(`جاري تشغيل عينة: ${charName} 🔊`);
+            
+            audio.play().catch(() => {
+                // Try fallback to GitHub Raw directly
+                audio.src = ghFallback;
+                audio.play().catch(() => {
+                    // Fallback to Web Speech API in Arabic
+                    if ('speechSynthesis' in window) {
+                        const utterance = new SpeechSynthesisUtterance(
+                            charName.includes('المسؤول') 
+                                ? 'الله يهديك أ سيدي المواطن، هذه استراتيجية مندمجة!' 
+                                : 'وا عباد الله! واش كتضحكو علينا ولا شنو؟!'
+                        );
+                        utterance.lang = 'ar-XA';
+                        utterance.pitch = charName.includes('المسؤول') ? 0.7 : (charName.includes('عيشة') ? 1.2 : 0.85);
+                        utterance.rate = 1.05;
+                        window.speechSynthesis.speak(utterance);
+                        showToast(`تشغيل عبر محاكي النطق: ${charName} 🎙️`);
+                    } else {
+                        showToast(`تعذر تشغيل الملف الصوتي: ${charName}`);
+                    }
+                });
+            });
         }
 
         async function fetchWithFallback(endpoint, rawPath) {

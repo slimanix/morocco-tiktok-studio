@@ -106,6 +106,8 @@ class handler(BaseHTTPRequestHandler):
                 content_type = "image/png"
             elif target_file.endswith(".mp4"):
                 content_type = "video/mp4"
+            elif target_file.endswith(".mp3"):
+                content_type = "audio/mpeg"
             elif target_file.endswith(".json"):
                 content_type = "application/json; charset=utf-8"
             else:
