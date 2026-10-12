@@ -5,19 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لوحة التحكم السحابية الذكية | @wa.3ibad.lah4</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Cairo', sans-serif; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #0b0f19; }
         ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #334155; }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
+            50% { box-shadow: 0 0 25px rgba(239, 68, 68, 0.8); }
+        }
+        .active-ring { animation: pulse-glow 2s infinite ease-in-out; }
     </style>
 </head>
 <body class="bg-gray-950 text-gray-100 min-h-screen antialiased selection:bg-red-600 selection:text-white">
 
-    <!-- Top Navigation / Header -->
-    <header class="border-b border-gray-800 bg-gray-900/90 backdrop-blur sticky top-0 z-50">
+    <!-- Top Toast Notification -->
+    <div id="toast" class="fixed top-4 left-1/2 -translate-x-1/2 z-50 transform -translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+        <div class="bg-gray-900 border border-emerald-500/50 text-white px-5 py-2.5 rounded-xl shadow-2xl flex items-center gap-2.5 text-xs font-bold">
+            <span class="text-emerald-400 text-sm">✅</span>
+            <span id="toast-msg">تم نسخ النص بنجاح!</span>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="border-b border-gray-800 bg-gray-900/90 backdrop-blur sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-11 h-11 rounded-full border-2 border-red-500 overflow-hidden bg-gray-800 shrink-0 shadow-lg shadow-red-950/40">
@@ -25,20 +38,20 @@
                 </div>
                 <div>
                     <h1 class="text-base md:text-lg font-black text-white flex items-center gap-2">
-                        وا عباد الله <span class="text-[10px] bg-red-600 text-white font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">سحابي ☁️ v2.5</span>
+                        وا عباد الله <span class="text-[10px] bg-red-600 text-white font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">سحابي ☁️ v3.0</span>
                     </h1>
-                    <p class="text-xs text-gray-400">@wa.3ibad.lah4 • استوديو الإنتاج الآلي والأرشفة الذكية</p>
+                    <p class="text-xs text-gray-400">@wa.3ibad.lah4 • نظام إنتاج ومراقبة التيك توك التلقائي</p>
                 </div>
             </div>
 
-            <!-- Header Badges & Quick Action -->
+            <!-- Action buttons -->
             <div class="flex items-center gap-2.5">
-                <button onclick="triggerImmediateRun()" class="hidden sm:flex items-center gap-1.5 text-xs bg-red-600 hover:bg-red-500 active:scale-95 text-white font-bold px-3 py-1.5 rounded-lg transition shadow-md shadow-red-950/60">
+                <button onclick="triggerImmediateRun()" class="flex items-center gap-1.5 text-xs bg-red-600 hover:bg-red-500 active:scale-95 text-white font-bold px-3.5 py-2 rounded-lg transition shadow-md shadow-red-950/60">
                     <span>⚡ تشغيل حلقة فورية</span>
                 </button>
-                <div class="flex items-center gap-2 bg-emerald-950/70 border border-emerald-800/80 px-3 py-1.5 rounded-full">
+                <div class="hidden sm:flex items-center gap-2 bg-emerald-950/70 border border-emerald-800/80 px-3 py-1.5 rounded-full">
                     <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span class="text-xs font-semibold text-emerald-300">سيرفر GitHub نشط</span>
+                    <span class="text-xs font-semibold text-emerald-300">سيرفر الإنتاج نشط</span>
                 </div>
             </div>
         </div>
@@ -51,16 +64,16 @@
                 <span>📊 لوحة القيادة المباشرة</span>
             </button>
             <button onclick="switchTab('gallery')" id="tab-btn-gallery" class="tab-btn px-4 py-2 rounded-lg bg-gray-800/70 text-gray-300 hover:bg-gray-800 transition flex items-center gap-1.5 shrink-0">
-                <span>🎬 معرض الحلقات المكتملة</span>
+                <span>🎬 مشغل واستوديو الحلقات (<span id="gallery-badge-count">8</span>)</span>
             </button>
             <button onclick="switchTab('characters')" id="tab-btn-characters" class="tab-btn px-4 py-2 rounded-lg bg-gray-800/70 text-gray-300 hover:bg-gray-800 transition flex items-center gap-1.5 shrink-0">
-                <span>🎭 استوديو الشخصيات والأصوات</span>
+                <span>🎭 استوديو الشخصيات ونغمات الصوت</span>
             </button>
             <button onclick="switchTab('schedule')" id="tab-btn-schedule" class="tab-btn px-4 py-2 rounded-lg bg-gray-800/70 text-gray-300 hover:bg-gray-800 transition flex items-center gap-1.5 shrink-0">
-                <span>⏰ جدول النشر وذروة المشاهدة</span>
+                <span>⏰ جدول مواعيد الذروة والنشر</span>
             </button>
             <button onclick="switchTab('health')" id="tab-btn-health" class="tab-btn px-4 py-2 rounded-lg bg-gray-800/70 text-gray-300 hover:bg-gray-800 transition flex items-center gap-1.5 shrink-0">
-                <span>🛡️ سلامة النظام ومكافحة الحظر</span>
+                <span>🛡️ سلامة النظام والتحليلات المعمقة</span>
             </button>
         </div>
     </nav>
@@ -71,55 +84,55 @@
         <!-- ================= TAB 1: OVERVIEW ================= -->
         <div id="tab-content-overview" class="tab-content space-y-6">
             
-            <!-- Metrics Grid -->
+            <!-- Real-time Metrics Grid -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
                 <div class="bg-gray-900/90 border border-gray-800 rounded-xl p-4 relative overflow-hidden">
                     <div class="absolute top-0 left-0 w-1 h-full bg-amber-500"></div>
-                    <p class="text-xs text-gray-400">مرحلة الحساب (TikTok Growth)</p>
+                    <p class="text-xs text-gray-400">مرحلة الحساب (TikTok Phase)</p>
                     <h3 id="phase-val" class="text-lg md:text-xl font-bold text-amber-400 mt-1">WARM_UP_P1</h3>
-                    <p class="text-[11px] text-gray-500 mt-1">اليوم 1 • بناء ثقة خوارزمية تيك توك</p>
+                    <p class="text-[11px] text-gray-500 mt-1">بناء الثقة ومكافحة الحظر</p>
                 </div>
                 <div class="bg-gray-900/90 border border-gray-800 rounded-xl p-4 relative overflow-hidden">
                     <div class="absolute top-0 left-0 w-1 h-full bg-blue-500"></div>
-                    <p class="text-xs text-gray-400">الهدف اليومي المبرمج</p>
-                    <h3 class="text-lg md:text-xl font-bold text-white mt-1">1 فيديو (آمن)</h3>
-                    <p class="text-[11px] text-gray-500 mt-1">وقت النشر: 20:30 بتوقيت المغرب</p>
+                    <p class="text-xs text-gray-400">معدل الإنتاج اليومي</p>
+                    <h3 class="text-lg md:text-xl font-bold text-white mt-1">1 إلى 4 فيديوهات</h3>
+                    <p class="text-[11px] text-gray-500 mt-1">وقت النشر الذهبي: 20:30</p>
                 </div>
                 <div class="bg-gray-900/90 border border-gray-800 rounded-xl p-4 relative overflow-hidden">
                     <div class="absolute top-0 left-0 w-1 h-full bg-emerald-500"></div>
-                    <p class="text-xs text-gray-400">التكلفة الشهرية للمشروع</p>
-                    <h3 class="text-lg md:text-xl font-bold text-emerald-400 mt-1">0.00 $ (مجاني دائماً)</h3>
-                    <p class="text-[11px] text-gray-500 mt-1">ZeroGPU + RubberBand TTS + Vercel</p>
+                    <p class="text-xs text-gray-400">التكلفة التشغيلية</p>
+                    <h3 class="text-lg md:text-xl font-bold text-emerald-400 mt-1">0.00 $ (مجاني 100%)</h3>
+                    <p class="text-[11px] text-gray-500 mt-1">ZeroGPU + RubberBand + GitHub</p>
                 </div>
                 <div class="bg-gray-900/90 border border-gray-800 rounded-xl p-4 relative overflow-hidden">
                     <div class="absolute top-0 left-0 w-1 h-full bg-purple-500"></div>
-                    <p class="text-xs text-gray-400">حالة مزامنة الذكاء الاصطناعي</p>
-                    <h3 class="text-lg md:text-xl font-bold text-purple-400 mt-1">ذكوري vs أنثوي ✅</h3>
-                    <p class="text-[11px] text-gray-500 mt-1">حركة الشفاه نشطة 100%</p>
+                    <p class="text-xs text-gray-400">حالة الشفاه والصوت</p>
+                    <h3 class="text-lg md:text-xl font-bold text-purple-400 mt-1">حركة ومطابقة متزامنة ✅</h3>
+                    <p class="text-[11px] text-gray-500 mt-1">مفصل صوتي ذكوري / أنثوي</p>
                 </div>
             </div>
 
-            <!-- Video Preview & Live Topics Grid -->
+            <!-- Video Player & Topics Live Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 
-                <!-- Video Preview Card -->
+                <!-- Main Vertical Video Player -->
                 <div class="bg-gray-900 border border-gray-800 rounded-xl p-5 flex flex-col items-center">
                     <div class="w-full flex items-center justify-between mb-3">
                         <h2 class="text-sm font-bold text-white flex items-center gap-2">
-                            🎬 آخر حلقة منتجة (مول الطاكسي vs المسؤول)
+                            🎬 مشغل الحلقة الرئيسية المباشرة
                         </h2>
-                        <span class="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full font-bold">1080x1920 HD</span>
+                        <span id="player-status-tag" class="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full font-bold">1080x1920 HD</span>
                     </div>
                     
-                    <div class="w-full max-w-[270px] aspect-[9/16] bg-black rounded-xl overflow-hidden border border-gray-800 relative shadow-2xl">
-                        <video controls class="w-full h-full object-contain" poster="output/background.jpg" preload="metadata">
+                    <div class="w-full max-w-[270px] aspect-[9/16] bg-black rounded-xl overflow-hidden border border-gray-800 relative shadow-2xl active-ring">
+                        <video id="main-video-player" controls class="w-full h-full object-contain" poster="output/background.jpg" preload="metadata">
                             <source src="output/test_official_with_subtitles.mp4" type="video/mp4">
                             متصفحك لا يدعم تشغيل الفيديو
                         </video>
                     </div>
 
                     <div class="mt-4 text-center w-full">
-                        <p class="text-xs text-gray-200 font-bold">حلقة اليوم: برلمان الوردة والمشاركة الحكومية 🏛️</p>
+                        <h3 id="current-video-title" class="text-xs text-gray-200 font-bold">حلقة اليوم: برلمان الوردة والمشاركة الحكومية 🏛️</h3>
                         <div class="flex items-center justify-center gap-2 mt-2">
                             <span class="text-[11px] bg-gray-800 text-amber-400 px-2.5 py-1 rounded border border-gray-700 font-semibold">🎙️ صوت رجولي حاد</span>
                             <span class="text-[11px] bg-gray-800 text-blue-400 px-2.5 py-1 rounded border border-gray-700 font-semibold">👄 حركة شفاه كاملة</span>
@@ -127,16 +140,19 @@
                     </div>
                 </div>
 
-                <!-- News Topics Feed -->
+                <!-- Real-time Filterable Topics Feed -->
                 <div class="lg:col-span-2 bg-gray-900 border border-gray-800 rounded-xl p-5 flex flex-col">
-                    <div class="flex items-center justify-between mb-4 border-b border-gray-800 pb-3">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4 border-b border-gray-800 pb-3">
                         <div>
                             <h2 class="text-sm font-bold text-white flex items-center gap-2">
                                 📡 بنك مواضيع اليوم الساخنة (هسبريس)
                             </h2>
-                            <p class="text-xs text-gray-400">يتم استخراج الأخبار وترشيح الشخصية المناسبة تلقائياً كل صباح</p>
+                            <p class="text-xs text-gray-400">تحديث صباحي تلقائي مع البحث الفوري وتحديد الشخصية المقترحة</p>
                         </div>
-                        <span class="text-xs bg-gray-800 text-gray-300 px-2.5 py-1 rounded-full border border-gray-700 font-bold" id="topics-count">20 موضوعاً</span>
+                        <div class="flex items-center gap-2 w-full sm:w-auto">
+                            <input type="text" id="topic-search" oninput="filterTopics()" placeholder="ابحث في الأخبار..." class="bg-gray-950 border border-gray-800 rounded-lg px-3 py-1 text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:border-red-500 w-full sm:w-44">
+                            <span class="text-xs bg-gray-800 text-gray-300 px-2.5 py-1 rounded-full border border-gray-700 font-bold shrink-0" id="topics-count">0</span>
+                        </div>
                     </div>
                     
                     <div id="topics-container" class="space-y-2.5 overflow-y-auto max-h-[460px] pr-1">
@@ -146,14 +162,18 @@
 
             </div>
 
-            <!-- Live Satirical Scripts Section -->
+            <!-- Satirical Scripts Interactive Feed -->
             <div class="bg-gray-900 border border-gray-800 rounded-xl p-5 flex flex-col">
-                <div class="flex items-center justify-between mb-4 border-b border-gray-800 pb-3">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 mb-4 border-b border-gray-800 pb-3">
                     <div>
                         <h2 class="text-sm font-bold text-white flex items-center gap-2">
                             📝 سيناريوهات الحلقات اليومية بالدارجة الساخرة
                         </h2>
-                        <p class="text-xs text-gray-400">حوارات كوميدية ذكية متناوبة بين صوت المواطن ورد المسؤول الحكومي</p>
+                        <p class="text-xs text-gray-400">انقر على زر النسخ لاستخدام الحوار أو مشاركته فوراً</p>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs">
+                        <span class="text-gray-400">تصفح السيناريوهات:</span>
+                        <div class="flex gap-1" id="scripts-pagination"></div>
                     </div>
                 </div>
                 <div id="scripts-container" class="space-y-3 overflow-y-auto max-h-[350px] pr-1">
@@ -163,15 +183,20 @@
 
         </div>
 
-        <!-- ================= TAB 2: GALLERY ================= -->
+        <!-- ================= TAB 2: GALLERY & PLAYER STUDIO ================= -->
         <div id="tab-content-gallery" class="tab-content hidden space-y-6">
             <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
-                <div class="flex items-center justify-between mb-4 border-b border-gray-800 pb-3">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5 border-b border-gray-800 pb-4">
                     <div>
                         <h2 class="text-base font-bold text-white flex items-center gap-2">
-                            🎬 مكتبة الحلقات المكتملة والأرشيف
+                            🎬 استوديو ومشغل الحلقات المكتملة
                         </h2>
-                        <p class="text-xs text-gray-400">استعراض ومشاهدة كافة الحلقات المنتجة بدقة 1080x1920 الجاهزة للتنزيل والنشر</p>
+                        <p class="text-xs text-gray-400">انقر على أي حلقة لتحميلها فوراً في المشغل الرئيسي أو نسخ عنوانها</p>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs">
+                        <span class="text-gray-400">تصفية:</span>
+                        <button onclick="filterGallery('all')" class="px-2.5 py-1 rounded bg-gray-800 hover:bg-gray-700 text-gray-200 font-semibold">الكل</button>
+                        <button onclick="filterGallery('ready')" class="px-2.5 py-1 rounded bg-emerald-950/80 border border-emerald-800 text-emerald-300 font-semibold">جاهز للنشر 🚀</button>
                     </div>
                 </div>
 
@@ -181,15 +206,15 @@
             </div>
         </div>
 
-        <!-- ================= TAB 3: CHARACTERS ================= -->
+        <!-- ================= TAB 3: CHARACTERS STUDIO ================= -->
         <div id="tab-content-characters" class="tab-content hidden space-y-6">
             <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
                 <div class="flex items-center justify-between mb-4 border-b border-gray-800 pb-3">
                     <div>
                         <h2 class="text-base font-bold text-white flex items-center gap-2">
-                            🎭 شخصيات القناة الذكية ومطابقة الأصوات (Gender Formants)
+                            🎭 استوديو الشخصيات ونغمات الصوت المتخصصة (Formant Tuning)
                         </h2>
-                        <p class="text-xs text-gray-400">كل شخصية تمتلك صورة بفم مغلق جاهز للنطق، ونبرة صوت خاصة بها (ذكورية / أنثوية)</p>
+                        <p class="text-xs text-gray-400">استمع لعينة الصوت المميزة لكل شخصية واطلع على سياق الأخبار المرتبط بها</p>
                     </div>
                 </div>
 
@@ -199,15 +224,15 @@
             </div>
         </div>
 
-        <!-- ================= TAB 4: SCHEDULE ================= -->
+        <!-- ================= TAB 4: SCHEDULE & TIMETABLE ================= -->
         <div id="tab-content-schedule" class="tab-content hidden space-y-6">
             <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
                 <div class="flex items-center justify-between mb-4 border-b border-gray-800 pb-3">
                     <div>
                         <h2 class="text-base font-bold text-white flex items-center gap-2">
-                            ⏰ جدول النشر ومواعيد الذروة بالمغرب (Posting Schedule)
+                            ⏰ جدول النشر ومواعيد الذروة بالمغرب (Moroccan Peak Algorithm)
                         </h2>
-                        <p class="text-xs text-gray-400">أوقات النشر المثلى حسب التوقيت المغربي لضمان أعلى نسبة وصول ومشاهدات (FYP)</p>
+                        <p class="text-xs text-gray-400">مواعيد النشر المبرمجة مع التعليق المثبت التفاعلي لرفع نسبة المشاهدة (FYP)</p>
                     </div>
                 </div>
 
@@ -217,17 +242,19 @@
             </div>
         </div>
 
-        <!-- ================= TAB 5: SYSTEM HEALTH ================= -->
+        <!-- ================= TAB 5: SYSTEM HEALTH & DEEP ANALYSIS ================= -->
         <div id="tab-content-health" class="tab-content hidden space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                
+                <!-- Anti-Ban & Growth Roadmap Card -->
                 <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
                     <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
                         🛡️ استراتيجية التدفئة وتفادي الحظر (Anti-Shadowban Roadmap)
                     </h3>
                     <div class="space-y-3 text-xs text-gray-300">
                         <div class="p-3 bg-emerald-950/40 border border-emerald-800/60 rounded-lg">
-                            <strong class="text-emerald-400 block mb-1">المرحلة الحالية: WARM_UP_P1 (الأيام 1 إلى 3)</strong>
-                            <p>نشر فيديو واحد يومياً فقط في وقت الذروة (20:30) مع فترات تفاعل يدوية لمدة 15 دقيقة لبناء ثقة الخوارزمية.</p>
+                            <strong class="text-emerald-400 block mb-1">المرحلة 1: WARM_UP_P1 (الأيام 1 إلى 3) - المرحلة الحالية</strong>
+                            <p>نشر فيديو واحد يومياً في وقت الذروة (20:30) مع فترات تفاعل يدوية لمدة 15 دقيقة لبناء ثقة الخوارزمية.</p>
                         </div>
                         <div class="p-3 bg-gray-950/60 border border-gray-800 rounded-lg">
                             <strong class="text-amber-400 block mb-1">المرحلة 2: WARM_UP_P2 (الأيام 4 إلى 7)</strong>
@@ -235,60 +262,62 @@
                         </div>
                         <div class="p-3 bg-gray-950/60 border border-gray-800 rounded-lg">
                             <strong class="text-blue-400 block mb-1">المرحلة 3: GROWTH (الأيام 8 إلى 14)</strong>
-                            <p>التوسع إلى 6 إلى 8 فيديوهات يومياً مع تحليل أفضل المواضيع تفاعلاً.</p>
+                            <p>التوسع إلى 6 إلى 8 فيديوهات يومياً مع تحليل أفضل المواضيع تفاعلاً ومشاركة.</p>
                         </div>
                         <div class="p-3 bg-gray-950/60 border border-gray-800 rounded-lg">
                             <strong class="text-purple-400 block mb-1">المرحلة 4: SCALING (اليوم 15 فما فوق)</strong>
-                            <p>الإنتاج المصنعي الكامل: 20 حلقة يومياً على مدار 24 ساعة بمعدل حلقة كل 45 دقيقة.</p>
+                            <p>الإنتاج المصنعي الكامل: 20 حلقة يومياً على مدار 24 ساعة بمعدل حلقة كل ساعة ونصف.</p>
                         </div>
                     </div>
                 </div>
 
+                <!-- Live Service Telemetry -->
                 <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
                     <h3 class="text-sm font-bold text-white mb-3 flex items-center gap-2">
-                        ⚙️ مؤشرات المحركات والخدمات المجانية
+                        ⚙️ مؤشرات المحركات والخدمات السحابية المجانية
                     </h3>
                     <div class="space-y-3 text-xs">
                         <div class="flex items-center justify-between p-3 bg-gray-950/60 border border-gray-800 rounded-lg">
                             <div>
                                 <strong class="text-white block">مكتبة Hugging Face ZeroGPU</strong>
-                                <span class="text-gray-400">توليد حركة الشفاه العصبية (Wav2Lip)</span>
+                                <span class="text-gray-400">توليد حركة الشفاه العصبية (Wav2Lip) بدون تكلفة</span>
                             </div>
                             <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded text-[11px] font-bold">نشط 🟢</span>
                         </div>
                         <div class="flex items-center justify-between p-3 bg-gray-950/60 border border-gray-800 rounded-lg">
                             <div>
                                 <strong class="text-white block">محرك الأصوات RubberBand & FFmpeg</strong>
-                                <span class="text-gray-400">توليد الأصوات الذكورية والأنثوية مجاناً بدون حدود</span>
+                                <span class="text-gray-400">تحويل النغمات الصوتية الذكورية والأنثوية بلا رصيد ولا اشتراك</span>
                             </div>
                             <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded text-[11px] font-bold">100% محلي مجاني 🟢</span>
                         </div>
                         <div class="flex items-center justify-between p-3 bg-gray-950/60 border border-gray-800 rounded-lg">
                             <div>
-                                <strong class="text-white block">استضافة Vercel Serverless</strong>
-                                <span class="text-gray-400">لوحة التحكم ومزامنة واجهات الـ API</span>
+                                <strong class="text-white block">استضافة Vercel Serverless Edge</strong>
+                                <span class="text-gray-400">لوحة التحكم ومزامنة واجهات الـ API في أجزاء من الثانية</span>
                             </div>
                             <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded text-[11px] font-bold">200 OK 🟢</span>
                         </div>
                         <div class="flex items-center justify-between p-3 bg-gray-950/60 border border-gray-800 rounded-lg">
                             <div>
                                 <strong class="text-white block">سيرفر GitHub Actions</strong>
-                                <span class="text-gray-400">مجدول يومي آلي (Cron Trigger)</span>
+                                <span class="text-gray-400">مجدول يومي آلي لتوليد الحلقات والأرشفة (2000 دقيقة مجانية)</span>
                             </div>
                             <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded text-[11px] font-bold">نشط 🟢</span>
                         </div>
                     </div>
                 </div>
+
             </div>
         </div>
 
-        <!-- Automation Controls & GitHub Links -->
+        <!-- Automation Controls Footer Banner -->
         <div class="bg-gradient-to-r from-gray-900 via-gray-900 to-red-950/40 border border-gray-800 rounded-xl p-5 flex flex-col md:flex-row items-center justify-between gap-4">
             <div>
                 <h3 class="text-sm font-bold text-white flex items-center gap-2">
-                    ⚡ الاستوديو السحابي الدائم (GitHub Actions)
+                    ⚡ الاستوديو السحابي الدائم (GitHub Actions Factory)
                 </h3>
-                <p class="text-xs text-gray-400 mt-0.5">يعمل الخادم تلقائياً يومياً في الساعة 20:30 بتوقيت المغرب. يمكنك تشغيل حلقة يدوياً في أي وقت.</p>
+                <p class="text-xs text-gray-400 mt-0.5">يعمل الخادم تلقائياً كل ليلة عند الساعة 20:30 بتوقيت المغرب. يمكنك طلب تشغيل فوري بنقرة واحدة.</p>
             </div>
             <div class="flex flex-wrap gap-2.5 shrink-0">
                 <a href="https://github.com/slimanix/morocco-tiktok-studio/actions/workflows/daily_tiktok_factory.yml" target="_blank" class="text-xs bg-red-600 hover:bg-red-500 text-white font-bold px-4 py-2 rounded-lg transition shadow-lg shadow-red-950/50 flex items-center gap-1.5">
@@ -306,8 +335,33 @@
         مشروع "وا عباد الله" • استوديو الإنتاج الآلي 100% مجاناً • مدعوم بـ Vercel و GitHub Actions
     </footer>
 
+    <!-- Audio Player for Character Sound Samples -->
+    <audio id="character-audio-player" class="hidden"></audio>
+
     <script>
         const GITHUB_RAW_BASE = "https://raw.githubusercontent.com/slimanix/morocco-tiktok-studio/main";
+        let cachedTopics = [];
+        let cachedGallery = [];
+        let cachedScripts = [];
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-msg').innerText = message;
+            toast.classList.remove('-translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            setTimeout(() => {
+                toast.classList.add('-translate-y-20', 'opacity-0');
+                toast.classList.remove('translate-y-0', 'opacity-100');
+            }, 2500);
+        }
+
+        function copyToClipboard(text, successMsg = "تم نسخ النص إلى الحافظة!") {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast(successMsg);
+            }).catch(() => {
+                showToast("تعذر النسخ التلقائي");
+            });
+        }
 
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
@@ -324,6 +378,23 @@
                 activeBtn.classList.remove('bg-gray-800/70', 'text-gray-300');
                 activeBtn.classList.add('bg-red-600', 'text-white');
             }
+        }
+
+        function playInMainPlayer(videoSrc, title) {
+            const player = document.getElementById('main-video-player');
+            player.src = videoSrc;
+            player.play();
+            document.getElementById('current-video-title').innerText = title;
+            switchTab('overview');
+            window.scrollTo({ top: 150, behavior: 'smooth' });
+            showToast(`جاري تشغيل: ${title}`);
+        }
+
+        function playCharacterAudio(audioSrc, charName) {
+            const audio = document.getElementById('character-audio-player');
+            audio.src = audioSrc;
+            audio.play();
+            showToast(`تشغيل عينة صوت: ${charName}`);
         }
 
         async function fetchWithFallback(endpoint, rawPath) {
@@ -347,6 +418,65 @@
             window.open("https://github.com/slimanix/morocco-tiktok-studio/actions/workflows/daily_tiktok_factory.yml", "_blank");
         }
 
+        function filterTopics() {
+            const query = (document.getElementById('topic-search').value || '').trim().toLowerCase();
+            const container = document.getElementById('topics-container');
+            const filtered = cachedTopics.filter(t => t.title.toLowerCase().includes(query) || (t.category && t.category.toLowerCase().includes(query)));
+            renderTopics(filtered);
+        }
+
+        function renderTopics(topicsList) {
+            const container = document.getElementById('topics-container');
+            document.getElementById('topics-count').innerText = `${topicsList.length} موضوعاً`;
+            if (topicsList.length === 0) {
+                container.innerHTML = '<p class="text-xs text-gray-500 text-center py-6">لم يتم العثور على مواضيع مطابقة</p>';
+                return;
+            }
+            container.innerHTML = topicsList.map((t, idx) => `
+                <div class="p-3 bg-gray-950/70 rounded-lg border border-gray-800/80 hover:border-gray-700 transition flex items-start gap-2.5">
+                    <span class="text-[11px] font-bold bg-gray-800 text-gray-300 w-5 h-5 rounded flex items-center justify-center shrink-0 mt-0.5">${idx+1}</span>
+                    <div class="flex-1">
+                        <p class="text-xs font-semibold text-gray-200 leading-snug">${t.title}</p>
+                        <div class="flex items-center justify-between mt-1.5">
+                            <span class="text-[10px] text-amber-400">[${t.category || 'خبر عام'} • هسبريس]</span>
+                            <button onclick="copyToClipboard('${t.title.replace(/'/g, "\\'")}', 'تم نسخ عنوان الخبر!')" class="text-[10px] text-gray-400 hover:text-white bg-gray-900 border border-gray-800 px-2 py-0.5 rounded">نسخ 📋</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterGallery(filterType) {
+            const container = document.getElementById('gallery-container');
+            let list = cachedGallery;
+            if (filterType === 'ready') {
+                list = cachedGallery.filter(g => g.badge.includes('جاهز'));
+            }
+            renderGallery(list);
+        }
+
+        function renderGallery(galleryList) {
+            const container = document.getElementById('gallery-container');
+            container.innerHTML = galleryList.map(g => `
+                <div class="bg-gray-950 border border-gray-800 rounded-xl overflow-hidden flex flex-col p-3 hover:border-gray-700 transition">
+                    <div class="aspect-[9/16] bg-black rounded-lg overflow-hidden border border-gray-850 relative mb-3 group cursor-pointer" onclick="playInMainPlayer('${g.video_src}', '${g.title.replace(/'/g, "\\'")}')">
+                        <video class="w-full h-full object-contain pointer-events-none" preload="metadata">
+                            <source src="${g.video_src}" type="video/mp4">
+                        </video>
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                            <span class="text-2xl bg-red-600/90 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg">▶</span>
+                        </div>
+                    </div>
+                    <h4 class="text-xs font-bold text-white line-clamp-1">${g.title}</h4>
+                    <p class="text-[10px] text-gray-400 mt-0.5">${g.characters}</p>
+                    <div class="flex items-center justify-between mt-2 pt-2 border-t border-gray-800 text-[10px] text-gray-500">
+                        <span>⏱️ ${g.duration}</span>
+                        <span class="text-emerald-400 font-semibold">${g.badge}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
         async function refreshDashboard() {
             try {
                 // 1. Account State
@@ -358,28 +488,23 @@
                 // 2. Daily Topics
                 const topics = await fetchWithFallback('/api/topics', 'output/daily_topics.json');
                 if (Array.isArray(topics) && topics.length > 0) {
-                    document.getElementById('topics-count').innerText = `${topics.length} موضوعاً`;
-                    const container = document.getElementById('topics-container');
-                    container.innerHTML = topics.map((t, idx) => `
-                        <div class="p-3 bg-gray-950/70 rounded-lg border border-gray-800/80 hover:border-gray-700 transition flex items-start gap-2.5">
-                            <span class="text-[11px] font-bold bg-gray-800 text-gray-300 w-5 h-5 rounded flex items-center justify-center shrink-0 mt-0.5">${idx+1}</span>
-                            <div class="flex-1">
-                                <p class="text-xs font-semibold text-gray-200">${t.title}</p>
-                                <span class="text-[10px] text-amber-400 mt-1 inline-block">[${t.category} • خبر اليوم]</span>
-                            </div>
-                        </div>
-                    `).join('');
+                    cachedTopics = topics;
+                    filterTopics();
                 }
 
                 // 3. Daily Scripts
                 const scripts = await fetchWithFallback('/api/scripts', 'output/daily_scripts.json');
                 if (Array.isArray(scripts) && scripts.length > 0) {
+                    cachedScripts = scripts;
                     const scrContainer = document.getElementById('scripts-container');
-                    scrContainer.innerHTML = scripts.slice(0, 5).map((s, idx) => `
+                    scrContainer.innerHTML = scripts.slice(0, 6).map((s, idx) => `
                         <div class="p-3.5 bg-gray-950/80 rounded-lg border border-gray-800/90 text-right">
                             <div class="flex items-center justify-between mb-2">
-                                <span class="text-xs font-bold text-red-400">حلقة ${s.episode_id}: ${s.headline}</span>
-                                <span class="text-[10px] bg-gray-800 text-gray-400 px-2 py-0.5 rounded">دارجة مغربية ساخرة</span>
+                                <span class="text-xs font-bold text-red-400">حلقة ${s.episode_id || idx+1}: ${s.headline}</span>
+                                <div class="flex items-center gap-1.5">
+                                    <span class="text-[10px] bg-gray-800 text-gray-400 px-2 py-0.5 rounded">دارجة ساخرة</span>
+                                    <button onclick="copyToClipboard('${s.headline.replace(/'/g, "\\'")}', 'تم نسخ عنوان الحلقة!')" class="text-[10px] bg-gray-800 hover:bg-gray-700 text-gray-300 px-1.5 py-0.5 rounded">📋</button>
+                                </div>
                             </div>
                             <div class="space-y-1.5 text-xs text-gray-300">
                                 ${s.dialogue.slice(0, 4).map(d => `
@@ -404,7 +529,10 @@
                                 </div>
                                 <p class="text-[11px] text-gray-400 mt-1">${c.role}</p>
                                 <p class="text-[10px] text-gray-500 mt-1 line-clamp-2"><strong>المواضيع:</strong> ${c.topics}</p>
-                                <span class="text-[10px] text-emerald-400 mt-1.5 inline-block font-mono">🎙️ ${c.voice_type}</span>
+                                <div class="flex items-center justify-between mt-2 pt-1 border-t border-gray-850">
+                                    <span class="text-[10px] text-emerald-400 font-mono">🎙️ ${c.voice_type}</span>
+                                    <button onclick="playCharacterAudio('${c.id === 'official_minister' ? 'output/test_official_voice.mp3' : 'output/test_taxi_voice.mp3'}', '${c.name}')" class="text-[10px] bg-gray-800 hover:bg-gray-700 text-gray-200 px-2 py-0.5 rounded">🔊 استمع</button>
+                                </div>
                             </div>
                         </div>
                     `).join('');
@@ -415,15 +543,18 @@
                 if (Array.isArray(sched) && sched.length > 0) {
                     const schedContainer = document.getElementById('schedule-container');
                     schedContainer.innerHTML = sched.map(s => `
-                        <div class="p-3.5 bg-gray-950/80 border border-gray-800/80 rounded-xl flex items-center justify-between hover:border-gray-700 transition">
-                            <div class="flex items-center gap-3">
-                                <span class="text-sm font-black text-amber-400 font-mono bg-gray-900 px-3 py-1.5 rounded-lg border border-gray-800">${s.time}</span>
+                        <div class="p-4 bg-gray-950/80 border border-gray-800/80 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3 hover:border-gray-700 transition">
+                            <div class="flex items-start md:items-center gap-3">
+                                <span class="text-sm font-black text-amber-400 font-mono bg-gray-900 px-3 py-1.5 rounded-lg border border-gray-800 shrink-0">${s.time}</span>
                                 <div>
                                     <h4 class="text-xs font-bold text-white">${s.headline}</h4>
-                                    <p class="text-[11px] text-gray-400">${s.slot} • ${s.character}</p>
+                                    <p class="text-[11px] text-gray-400 mt-0.5">${s.slot} • ${s.character}</p>
                                 </div>
                             </div>
-                            <span class="text-[11px] font-bold px-2.5 py-1 rounded-full border ${s.badge}">${s.status}</span>
+                            <div class="flex items-center gap-2 self-end md:self-auto">
+                                <button onclick="copyToClipboard('${(s.pinned_comment || '').replace(/'/g, "\\'")}', 'تم نسخ التعليق المثبت!')" class="text-[10px] bg-gray-900 hover:bg-gray-800 text-gray-300 border border-gray-700 px-2.5 py-1 rounded">نسخ التعليق المثبت 📌</button>
+                                <span class="text-[11px] font-bold px-2.5 py-1 rounded-full border ${s.badge}">${s.status}</span>
+                            </div>
                         </div>
                     `).join('');
                 }
@@ -431,22 +562,9 @@
                 // 6. Gallery
                 const gallery = await fetchWithFallback('/api/gallery', 'output/episodes_gallery.json');
                 if (Array.isArray(gallery) && gallery.length > 0) {
-                    const gallContainer = document.getElementById('gallery-container');
-                    gallContainer.innerHTML = gallery.map(g => `
-                        <div class="bg-gray-950 border border-gray-800 rounded-xl overflow-hidden flex flex-col p-3 hover:border-gray-700 transition">
-                            <div class="aspect-[9/16] bg-black rounded-lg overflow-hidden border border-gray-850 relative mb-3">
-                                <video controls class="w-full h-full object-contain" preload="none">
-                                    <source src="${g.video_src}" type="video/mp4">
-                                </video>
-                            </div>
-                            <h4 class="text-xs font-bold text-white">${g.title}</h4>
-                            <p class="text-[10px] text-gray-400 mt-0.5">${g.characters}</p>
-                            <div class="flex items-center justify-between mt-2 pt-2 border-t border-gray-800 text-[10px] text-gray-500">
-                                <span>⏱️ ${g.duration}</span>
-                                <span class="text-emerald-400 font-semibold">${g.badge}</span>
-                            </div>
-                        </div>
-                    `).join('');
+                    cachedGallery = gallery;
+                    document.getElementById('gallery-badge-count').innerText = gallery.length;
+                    renderGallery(gallery);
                 }
 
             } catch (err) {

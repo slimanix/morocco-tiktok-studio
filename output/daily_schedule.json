@@ -1,38 +1,42 @@
 [
   {
-    "time": "20:30",
-    "slot": "وقت الذروة الليلي (Prime Time)",
+    "time": "12:30",
+    "slot": "فترة استراحة الغداء (Lunch Peak)",
     "episode_id": 1,
-    "headline": "برلمان الوردة يؤيد المشاركة الحكومية",
-    "character": "مول الطاكسي vs المسؤول",
+    "headline": "المنصوري تواجه تحدي تحويل \"الرمزية التاريخية\" إلى إصلاحات مستدامة",
+    "character": "المواطن vs المسؤول",
     "status": "جاهز للنشر 🚀",
-    "badge": "bg-emerald-500/20 text-emerald-400 border-emerald-500/30"
+    "badge": "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
+    "pinned_comment": "واش نتوما مع كلام المسؤول ولا مع المواطن؟ صوتو فالتعليقات 👇"
   },
   {
-    "time": "21:15",
-    "slot": "فترة السمر والدردشة",
+    "time": "16:45",
+    "slot": "فترة العودة من العمل (Afternoon Commute)",
     "episode_id": 2,
-    "headline": "تقليص عدد الوزراء والجدل البرلماني",
-    "character": "مول الحانوت vs المسؤول",
-    "status": "مجدول ⏳",
-    "badge": "bg-amber-500/20 text-amber-400 border-amber-500/30"
-  },
-  {
-    "time": "22:00",
-    "slot": "التفاعل الأقصى في المساء",
-    "episode_id": 3,
-    "headline": "تراجع الدرهم والأسعار في السوق",
-    "character": "با رحال الفلاح vs المسؤول",
-    "status": "مجدول ⏳",
-    "badge": "bg-blue-500/20 text-blue-400 border-blue-500/30"
-  },
-  {
-    "time": "22:45",
-    "slot": "سهرة التيك توك",
-    "episode_id": 4,
-    "headline": "أزمة الحليب والأبقار المستوردة",
+    "headline": "الصحراء المغربية .. مواقف عربية وإفريقية وأمريكية تجدد دعم الحكم الذاتي",
     "character": "المواطن vs المسؤول",
     "status": "مجدول ⏳",
-    "badge": "bg-purple-500/20 text-purple-400 border-purple-500/30"
+    "badge": "bg-blue-500/20 text-blue-400 border-blue-500/30",
+    "pinned_comment": "واش نتوما مع كلام المسؤول ولا مع المواطن؟ صوتو فالتعليقات 👇"
+  },
+  {
+    "time": "20:30",
+    "slot": "وقت الذروة الليلي الذهبي (Prime Time)",
+    "episode_id": 3,
+    "headline": "افتتاح البرلمان يزيد الضغط على المنصوري لتسريع تشكيل الحكومة",
+    "character": "المواطن vs المسؤول",
+    "status": "مجدول ⏳",
+    "badge": "bg-purple-500/20 text-purple-400 border-purple-500/30",
+    "pinned_comment": "واش نتوما مع كلام المسؤول ولا مع المواطن؟ صوتو فالتعليقات 👇"
+  },
+  {
+    "time": "22:15",
+    "slot": "سهرة التيك توك والتفاعل (Late Night Scroll)",
+    "episode_id": 4,
+    "headline": "نبيلة جلال تقود المجموعة النيابية لليسار",
+    "character": "المواطن vs المسؤول",
+    "status": "مجدول ⏳",
+    "badge": "bg-amber-500/20 text-amber-400 border-amber-500/30",
+    "pinned_comment": "واش نتوما مع كلام المسؤول ولا مع المواطن؟ صوتو فالتعليقات 👇"
   }
 ]
