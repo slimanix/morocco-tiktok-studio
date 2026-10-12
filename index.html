@@ -618,11 +618,62 @@
             showToast(`جاري تشغيل: ${title} 🎬`);
         }
 
+        async function fetchWithFallback(endpoint, rawPath) {
+            try {
+                const res = await fetch(endpoint + '?t=' + Date.now());
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data && (Array.isArray(data) ? data.length > 0 : Object.keys(data).length > 0)) {
+                        return data;
+                    }
+                }
+            } catch (e) {}
+            try {
+                const ghRes = await fetch(`${GITHUB_RAW_BASE}/${rawPath}?t=` + Date.now());
+                if (ghRes.ok) return await ghRes.json();
+            } catch (e) {}
+            return null;
+        }
+
+        function filterTopics() {
+            const searchInput = document.getElementById('topic-search');
+            const query = (searchInput ? searchInput.value : '').trim().toLowerCase();
+            const filtered = cachedTopics.filter(t => (t.title && t.title.toLowerCase().includes(query)) || (t.category && t.category.toLowerCase().includes(query)));
+            renderTopics(filtered);
+        }
+
+        function renderTopics(topicsList) {
+            const container = document.getElementById('topics-container');
+            if (!container) return;
+            const countEl = document.getElementById('topics-count');
+            if (countEl) countEl.innerText = `${topicsList.length} موضوعاً`;
+            if (topicsList.length === 0) {
+                container.innerHTML = '<p class="text-xs text-gray-500 text-center py-6">لم يتم العثور على مواضيع مطابقة</p>';
+                return;
+            }
+            container.innerHTML = topicsList.map((t, idx) => `
+                <div class="p-3 bg-gray-950/70 rounded-lg border border-gray-800/80 hover:border-gray-700 transition flex items-start gap-2.5">
+                    <span class="text-[11px] font-bold bg-gray-800 text-gray-300 w-5 h-5 rounded flex items-center justify-center shrink-0 mt-0.5">${idx+1}</span>
+                    <div class="flex-1">
+                        <p class="text-xs font-semibold text-gray-200 leading-snug">${t.title}</p>
+                        <div class="flex items-center justify-between mt-2">
+                            <span class="text-[10px] text-amber-400">[${t.category || 'خبر عام'} • هسبريس]</span>
+                            <div class="flex items-center gap-1.5">
+                                <button onclick="populateStudioFromTopic('${t.title.replace(/'/g, "\\'")}')" class="text-[10px] text-red-400 hover:text-white bg-red-950/60 border border-red-800/80 hover:bg-red-800 px-2 py-0.5 rounded font-bold transition flex items-center gap-1">
+                                    <span>⚡ إنتاج فيديو</span>
+                                </button>
+                                <button onclick="copyToClipboard('${t.title.replace(/'/g, "\\'")}', 'تم نسخ عنوان الخبر!')" class="text-[10px] text-gray-400 hover:text-white bg-gray-900 border border-gray-800 px-2 py-0.5 rounded">نسخ 📋</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
         function filterGallery(filterType) {
-            const container = document.getElementById('gallery-container');
             let list = cachedGallery;
             if (filterType === 'ready') {
-                list = cachedGallery.filter(g => g.badge.includes('جاهز'));
+                list = cachedGallery.filter(g => g.badge && g.badge.includes('جاهز'));
             }
             renderGallery(list);
         }
@@ -696,104 +747,135 @@
         }
 
         async function refreshDashboard() {
+            // 1. Account State
             try {
-                // 1. Account State
                 const state = await fetchWithFallback('/api/state', 'output/account_state.json');
                 if (state && state.current_phase) {
-                    document.getElementById('phase-val').innerText = `${state.current_phase} (اليوم ${state.current_day})`;
+                    const phaseEl = document.getElementById('phase-val');
+                    if (phaseEl) phaseEl.innerText = `${state.current_phase} (اليوم ${state.current_day})`;
                 }
+            } catch (err) {
+                console.warn("State update error:", err);
+            }
 
-                // 2. Daily Topics
+            // 2. Daily Topics
+            try {
                 const topics = await fetchWithFallback('/api/topics', 'output/daily_topics.json');
                 if (Array.isArray(topics) && topics.length > 0) {
                     cachedTopics = topics;
                     filterTopics();
                 }
+            } catch (err) {
+                console.warn("Topics update error:", err);
+            }
 
-                // 3. Daily Scripts
+            // 3. Daily Scripts
+            try {
                 const scripts = await fetchWithFallback('/api/scripts', 'output/daily_scripts.json');
                 if (Array.isArray(scripts) && scripts.length > 0) {
                     cachedScripts = scripts;
                     const scrContainer = document.getElementById('scripts-container');
-                    scrContainer.innerHTML = scripts.slice(0, 6).map((s, idx) => `
-                        <div class="p-3.5 bg-gray-950/80 rounded-lg border border-gray-800/90 text-right">
-                            <div class="flex items-center justify-between mb-2">
-                                <span class="text-xs font-bold text-red-400">حلقة ${s.episode_id || idx+1}: ${s.headline}</span>
-                                <div class="flex items-center gap-1.5">
-                                    <button onclick="populateStudioFromTopic('${s.headline.replace(/'/g, "\\'")}')" class="text-[10px] bg-red-950/80 border border-red-800 text-red-300 px-2 py-0.5 rounded font-bold hover:bg-red-800 transition">⚡ إنتاج فيديو</button>
-                                    <button onclick="copyToClipboard('${s.headline.replace(/'/g, "\\'")}', 'تم نسخ عنوان الحلقة!')" class="text-[10px] bg-gray-800 hover:bg-gray-700 text-gray-300 px-1.5 py-0.5 rounded">📋</button>
+                    if (scrContainer) {
+                        scrContainer.innerHTML = scripts.slice(0, 6).map((s, idx) => `
+                            <div class="p-3.5 bg-gray-950/80 rounded-lg border border-gray-800/90 text-right">
+                                <div class="flex items-center justify-between mb-2">
+                                    <span class="text-xs font-bold text-red-400">حلقة ${s.episode_id || idx+1}: ${s.headline}</span>
+                                    <div class="flex items-center gap-1.5">
+                                        <button onclick="populateStudioFromTopic('${(s.headline || '').replace(/'/g, "\\'")}')" class="text-[10px] bg-red-950/80 border border-red-800 text-red-300 px-2 py-0.5 rounded font-bold hover:bg-red-800 transition">⚡ إنتاج فيديو</button>
+                                        <button onclick="copyToClipboard('${(s.headline || '').replace(/'/g, "\\'")}', 'تم نسخ عنوان الحلقة!')" class="text-[10px] bg-gray-800 hover:bg-gray-700 text-gray-300 px-1.5 py-0.5 rounded">📋</button>
+                                    </div>
+                                </div>
+                                <div class="space-y-1.5 text-xs text-gray-300">
+                                    ${(s.dialogue || []).slice(0, 4).map(d => `
+                                        <p class="leading-relaxed"><strong class="${d.speaker && d.speaker.includes('المواطن') ? 'text-amber-400' : 'text-blue-400'}">${d.speaker}:</strong> ${d.text}</p>
+                                    `).join('')}
                                 </div>
                             </div>
-                            <div class="space-y-1.5 text-xs text-gray-300">
-                                ${s.dialogue.slice(0, 4).map(d => `
-                                    <p class="leading-relaxed"><strong class="${d.speaker.includes('المواطن') ? 'text-amber-400' : 'text-blue-400'}">${d.speaker}:</strong> ${d.text}</p>
-                                `).join('')}
-                            </div>
-                        </div>
-                    `).join('');
+                        `).join('');
+                    }
                 }
+            } catch (err) {
+                console.warn("Scripts update error:", err);
+            }
 
-                // 4. Characters
+            // 4. Characters
+            try {
                 const chars = await fetchWithFallback('/api/characters', 'output/characters_data.json');
                 if (Array.isArray(chars) && chars.length > 0) {
                     const charContainer = document.getElementById('characters-container');
-                    charContainer.innerHTML = chars.map(c => `
-                        <div class="p-4 bg-gray-950/80 border border-gray-800/80 rounded-xl flex items-start gap-3.5 hover:border-gray-700 transition">
-                            <img src="${c.image}" alt="${c.name}" class="w-16 h-16 rounded-xl object-cover border-2 border-${c.badge_color}-500 shrink-0 shadow-md">
-                            <div class="flex-1">
-                                <div class="flex items-center justify-between">
-                                    <h4 class="text-xs font-bold text-white">${c.name}</h4>
-                                    <span class="text-[10px] bg-gray-800 text-${c.badge_color}-400 px-2 py-0.5 rounded font-semibold">${c.gender}</span>
-                                </div>
-                                <p class="text-[11px] text-gray-400 mt-1">${c.role}</p>
-                                <p class="text-[10px] text-gray-500 mt-1 line-clamp-2"><strong>المواضيع:</strong> ${c.topics}</p>
-                                <div class="flex items-center justify-between mt-2 pt-1 border-t border-gray-850">
-                                    <span class="text-[10px] text-emerald-400 font-mono">🎙️ ${c.voice_type}</span>
-                                    <button onclick="playCharacterAudio('${c.audio_sample || (characterMetadata[c.id] ? characterMetadata[c.id].audio : 'output/voice_moul_taxi.mp3')}', '${c.name}')" class="text-[10px] bg-gray-800 hover:bg-gray-700 text-gray-200 px-2.5 py-1 rounded font-bold transition">🔊 استمع</button>
+                    if (charContainer) {
+                        charContainer.innerHTML = chars.map(c => `
+                            <div class="p-4 bg-gray-950/80 border border-gray-800/80 rounded-xl flex items-start gap-3.5 hover:border-gray-700 transition">
+                                <img src="${c.image}" alt="${c.name}" class="w-16 h-16 rounded-xl object-cover border-2 border-${c.badge_color || 'red'}-500 shrink-0 shadow-md">
+                                <div class="flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <h4 class="text-xs font-bold text-white">${c.name}</h4>
+                                        <span class="text-[10px] bg-gray-800 text-${c.badge_color || 'red'}-400 px-2 py-0.5 rounded font-semibold">${c.gender}</span>
+                                    </div>
+                                    <p class="text-[11px] text-gray-400 mt-1">${c.role}</p>
+                                    <p class="text-[10px] text-gray-500 mt-1 line-clamp-2"><strong>المواضيع:</strong> ${c.topics}</p>
+                                    <div class="flex items-center justify-between mt-2 pt-1 border-t border-gray-850">
+                                        <span class="text-[10px] text-emerald-400 font-mono">🎙️ ${c.voice_type}</span>
+                                        <button onclick="playCharacterAudio('${c.audio_sample || (characterMetadata[c.id] ? characterMetadata[c.id].audio : 'output/voice_moul_taxi.mp3')}', '${c.name}')" class="text-[10px] bg-gray-800 hover:bg-gray-700 text-gray-200 px-2.5 py-1 rounded font-bold transition">🔊 استمع</button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    `).join('');
+                        `).join('');
+                    }
                 }
+            } catch (err) {
+                console.warn("Characters update error:", err);
+            }
 
-                // 5. Schedule
+            // 5. Schedule
+            try {
                 const sched = await fetchWithFallback('/api/schedule', 'output/daily_schedule.json');
                 if (Array.isArray(sched) && sched.length > 0) {
                     const schedContainer = document.getElementById('schedule-container');
-                    schedContainer.innerHTML = sched.map(s => `
-                        <div class="p-4 bg-gray-950/80 border border-gray-800/80 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3 hover:border-gray-700 transition">
-                            <div class="flex items-start md:items-center gap-3">
-                                <span class="text-sm font-black text-amber-400 font-mono bg-gray-900 px-3 py-1.5 rounded-lg border border-gray-800 shrink-0">${s.time}</span>
-                                <div>
-                                    <h4 class="text-xs font-bold text-white">${s.headline}</h4>
-                                    <p class="text-[11px] text-gray-400 mt-0.5">${s.slot} • ${s.character}</p>
+                    if (schedContainer) {
+                        schedContainer.innerHTML = sched.map(s => `
+                            <div class="p-4 bg-gray-950/80 border border-gray-800/80 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3 hover:border-gray-700 transition">
+                                <div class="flex items-start md:items-center gap-3">
+                                    <span class="text-sm font-black text-amber-400 font-mono bg-gray-900 px-3 py-1.5 rounded-lg border border-gray-800 shrink-0">${s.time}</span>
+                                    <div>
+                                        <h4 class="text-xs font-bold text-white">${s.headline}</h4>
+                                        <p class="text-[11px] text-gray-400 mt-0.5">${s.slot} • ${s.character}</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-2 self-end md:self-auto">
+                                    <button onclick="copyToClipboard('${(s.pinned_comment || '').replace(/'/g, "\\'")}', 'تم نسخ التعليق المثبت!')" class="text-[10px] bg-gray-900 hover:bg-gray-800 text-gray-300 border border-gray-700 px-2.5 py-1 rounded">نسخ التعليق المثبت 📌</button>
+                                    <span class="text-[11px] font-bold px-2.5 py-1 rounded-full border ${s.badge}">${s.status}</span>
                                 </div>
                             </div>
-                            <div class="flex items-center gap-2 self-end md:self-auto">
-                                <button onclick="copyToClipboard('${(s.pinned_comment || '').replace(/'/g, "\\'")}', 'تم نسخ التعليق المثبت!')" class="text-[10px] bg-gray-900 hover:bg-gray-800 text-gray-300 border border-gray-700 px-2.5 py-1 rounded">نسخ التعليق المثبت 📌</button>
-                                <span class="text-[11px] font-bold px-2.5 py-1 rounded-full border ${s.badge}">${s.status}</span>
-                            </div>
-                        </div>
-                    `).join('');
+                        `).join('');
+                    }
                 }
+            } catch (err) {
+                console.warn("Schedule update error:", err);
+            }
 
-                // 6. Gallery
+            // 6. Gallery
+            try {
                 const gallery = await fetchWithFallback('/api/gallery', 'output/episodes_gallery.json');
                 if (Array.isArray(gallery) && gallery.length > 0) {
                     cachedGallery = gallery;
-                    document.getElementById('gallery-badge-count').innerText = gallery.length;
+                    const badgeCountEl = document.getElementById('gallery-badge-count');
+                    if (badgeCountEl) badgeCountEl.innerText = gallery.length;
                     renderGallery(gallery);
                 }
+            } catch (err) {
+                console.warn("Gallery update error:", err);
+            }
 
-                // 7. Manual Queue
+            // 7. Manual Queue
+            try {
                 const queue = await fetchWithFallback('/api/manual_queue', 'output/manual_queue.json');
                 if (Array.isArray(queue) && queue.length > 0) {
                     cachedQueue = queue;
                     renderQueue(queue);
                 }
-
             } catch (err) {
-                console.error("Dashboard sync error:", err);
+                console.warn("Queue update error:", err);
             }
         }
 
