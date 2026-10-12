@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم السحابية الذكية | @wa.3ibad.lah4</title>
+    <title>استوديو ومولد الفيديو السحابي الذكي | @wa.3ibad.lah4</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <style>
@@ -38,7 +38,7 @@
                 </div>
                 <div>
                     <h1 class="text-base md:text-lg font-black text-white flex items-center gap-2">
-                        وا عباد الله <span class="text-[10px] bg-red-600 text-white font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">سحابي ☁️ v3.0</span>
+                        وا عباد الله <span class="text-[10px] bg-red-600 text-white font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">سحابي ☁️ v3.5 Studio</span>
                     </h1>
                     <p class="text-xs text-gray-400">@wa.3ibad.lah4 • نظام إنتاج ومراقبة التيك توك التلقائي</p>
                 </div>
@@ -46,8 +46,8 @@
 
             <!-- Action buttons -->
             <div class="flex items-center gap-2.5">
-                <button onclick="triggerImmediateRun()" class="flex items-center gap-1.5 text-xs bg-red-600 hover:bg-red-500 active:scale-95 text-white font-bold px-3.5 py-2 rounded-lg transition shadow-md shadow-red-950/60">
-                    <span>⚡ تشغيل حلقة فورية</span>
+                <button onclick="switchTab('studio')" class="flex items-center gap-1.5 text-xs bg-red-600 hover:bg-red-500 active:scale-95 text-white font-bold px-3.5 py-2 rounded-lg transition shadow-md shadow-red-950/60">
+                    <span>⚡ مولد الفيديو الفوري</span>
                 </button>
                 <div class="hidden sm:flex items-center gap-2 bg-emerald-950/70 border border-emerald-800/80 px-3 py-1.5 rounded-full">
                     <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -62,6 +62,9 @@
         <div class="max-w-7xl mx-auto px-4 flex items-center gap-2 overflow-x-auto py-2 text-xs font-bold">
             <button onclick="switchTab('overview')" id="tab-btn-overview" class="tab-btn px-4 py-2 rounded-lg bg-red-600 text-white transition flex items-center gap-1.5 shrink-0">
                 <span>📊 لوحة القيادة المباشرة</span>
+            </button>
+            <button onclick="switchTab('studio')" id="tab-btn-studio" class="tab-btn px-4 py-2 rounded-lg bg-gray-800/70 text-gray-300 hover:bg-gray-800 transition flex items-center gap-1.5 shrink-0">
+                <span>⚡ استوديو توليد الحلقات (Studio Generator)</span>
             </button>
             <button onclick="switchTab('gallery')" id="tab-btn-gallery" class="tab-btn px-4 py-2 rounded-lg bg-gray-800/70 text-gray-300 hover:bg-gray-800 transition flex items-center gap-1.5 shrink-0">
                 <span>🎬 مشغل واستوديو الحلقات (<span id="gallery-badge-count">8</span>)</span>
@@ -147,7 +150,7 @@
                             <h2 class="text-sm font-bold text-white flex items-center gap-2">
                                 📡 بنك مواضيع اليوم الساخنة (هسبريس)
                             </h2>
-                            <p class="text-xs text-gray-400">تحديث صباحي تلقائي مع البحث الفوري وتحديد الشخصية المقترحة</p>
+                            <p class="text-xs text-gray-400">تحديث صباحي تلقائي مع زر تحويل أي خبر فوراً إلى حلقة مصورة</p>
                         </div>
                         <div class="flex items-center gap-2 w-full sm:w-auto">
                             <input type="text" id="topic-search" oninput="filterTopics()" placeholder="ابحث في الأخبار..." class="bg-gray-950 border border-gray-800 rounded-lg px-3 py-1 text-xs text-gray-200 placeholder-gray-500 focus:outline-none focus:border-red-500 w-full sm:w-44">
@@ -169,11 +172,7 @@
                         <h2 class="text-sm font-bold text-white flex items-center gap-2">
                             📝 سيناريوهات الحلقات اليومية بالدارجة الساخرة
                         </h2>
-                        <p class="text-xs text-gray-400">انقر على زر النسخ لاستخدام الحوار أو مشاركته فوراً</p>
-                    </div>
-                    <div class="flex items-center gap-2 text-xs">
-                        <span class="text-gray-400">تصفح السيناريوهات:</span>
-                        <div class="flex gap-1" id="scripts-pagination"></div>
+                        <p class="text-xs text-gray-400">انقر على زر "إنتاج فيديو" لتحميل الحوار في استوديو التوليد المباشر</p>
                     </div>
                 </div>
                 <div id="scripts-container" class="space-y-3 overflow-y-auto max-h-[350px] pr-1">
@@ -183,7 +182,144 @@
 
         </div>
 
-        <!-- ================= TAB 2: GALLERY & PLAYER STUDIO ================= -->
+        <!-- ================= TAB 2: INTERACTIVE VIDEO STUDIO GENERATOR ================= -->
+        <div id="tab-content-studio" class="tab-content hidden space-y-6">
+            <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5 border-b border-gray-800 pb-4">
+                    <div>
+                        <h2 class="text-base font-bold text-white flex items-center gap-2">
+                            ⚡ استوديو توليد وتخصيص الحلقات الفوري (Dynamic Video Studio)
+                        </h2>
+                        <p class="text-xs text-gray-400">قم بإنشاء حلقة جديدة مخصصة بالكامل: اختر الشخصية، الموضوع، أسلوب الحوار، وسرعة الكاميرا</p>
+                    </div>
+                    <span class="text-xs bg-red-600/20 text-red-400 border border-red-500/30 px-3 py-1 rounded-full font-bold">100% Free AI Pipeline</span>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    
+                    <!-- Generator Configuration Form -->
+                    <div class="lg:col-span-2 space-y-4">
+                        
+                        <!-- Headline Input -->
+                        <div>
+                            <label class="block text-xs font-bold text-gray-300 mb-1.5">عنوان الحلقة أو الخبر الساخن:</label>
+                            <input type="text" id="studio-headline" placeholder="مثال: أسعار المحروقات تلهب جيوب المغاربة والحكومة تبرر" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition">
+                        </div>
+
+                        <!-- Character Selection -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-300 mb-1.5">شخصية المواطن (المتكلم الأول):</label>
+                                <select id="studio-citizen-char" onchange="updateStudioPreview()" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-red-500">
+                                    <option value="moul_taxi">مول الطاكسي (كازا) - صوت رجولي حاد 🚕</option>
+                                    <option value="ba_rahal">با رحال (الفلاح) - صوت بدوي أصيل 🚜</option>
+                                    <option value="moul_hanout">مول الحانوت (سوس) - صوت تجاري ساخر 🛒</option>
+                                    <option value="mi_aicha">مي عيشة (ربة بيت) - صوت نسائي معبر 🧺</option>
+                                    <option value="oustad_teacher">الأستاذ (رجل التعليم) - صوت مثقف صبور 📚</option>
+                                    <option value="tabib_doctor">طبيب المستعجلات - صوت متعب ومباشر 🩺</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-bold text-gray-300 mb-1.5">شخصية الطرف المقابل:</label>
+                                <select id="studio-opponent-char" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2.5 text-xs text-white focus:outline-none focus:border-red-500">
+                                    <option value="official_minister">المسؤول الحكومي (كيبرّد الطرح) - صوت باريتون رخيم 🏛️</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Satirical Tone & Camera FX -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-300 mb-1.5">نبرة الحوار:</label>
+                                <select id="studio-tone" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500">
+                                    <option value="aggressive">معصب ومصدوم (Maximum Drama) 🔥</option>
+                                    <option value="sarcastic">تهكم وضحك كحل (Dark Comedy) 🎭</option>
+                                    <option value="philosophical">فلسفة شعبية (Street Logic) ☕</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-300 mb-1.5">حركة الكاميرا (Kinetic FX):</label>
+                                <select id="studio-camera" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500">
+                                    <option value="1.10">زوم حركي ديناميكي (Punch-Zoom 1.10x) ⚡</option>
+                                    <option value="1.15">زوم مكثف وسريع (Fast Zoom 1.15x) 🚀</option>
+                                    <option value="1.05">زوم هادئ سينمائي (Subtle Zoom 1.05x) 🎥</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-300 mb-1.5">دقة الفيديو النهائية:</label>
+                                <select id="studio-quality" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500">
+                                    <option value="1080">1080x1920 (TikTok HD) 📱</option>
+                                    <option value="720">720x1280 (Fast Render) ⚡</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Custom Dialogue Hook (Optional) -->
+                        <div>
+                            <label class="block text-xs font-bold text-gray-300 mb-1.5">افتتاحية الحوار (Hook Darija):</label>
+                            <textarea id="studio-dialogue-hook" rows="3" placeholder="وا عباد الله! واش كتضحكو علينا ولا شنو؟! قالك التوازن المالي وحنا الجيب تقبوه بالزيادات!" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-red-500 leading-relaxed"></textarea>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="flex flex-wrap items-center gap-3 pt-2">
+                            <button onclick="queueAndGenerateEpisode()" class="flex-1 bg-red-600 hover:bg-red-500 active:scale-95 text-white font-black py-3 px-6 rounded-xl transition shadow-lg shadow-red-950/60 flex items-center justify-center gap-2 text-xs">
+                                <span>🚀 بدء توليد الحلقة وإرسالها للمحرك السحابي</span>
+                            </button>
+                            <button onclick="previewAudioFormant()" class="bg-gray-800 hover:bg-gray-700 text-gray-200 font-bold py-3 px-4 rounded-xl border border-gray-700 transition text-xs flex items-center gap-1.5">
+                                <span>🔊 تجربة نبرة الصوت</span>
+                            </button>
+                        </div>
+
+                    </div>
+
+                    <!-- Live Studio Preview Card -->
+                    <div class="bg-gray-950 border border-gray-800 rounded-xl p-4 flex flex-col items-center justify-between">
+                        <div class="w-full text-center">
+                            <span class="text-[10px] bg-gray-900 text-gray-400 border border-gray-800 px-2.5 py-1 rounded-full font-bold">معاينة الشخصية والإعدادات</span>
+                            <div class="w-32 h-32 rounded-2xl overflow-hidden border-2 border-red-500 mt-3 mx-auto shadow-xl">
+                                <img id="studio-preview-img" src="output/characters/moul_taxi.jpg" alt="Preview" class="w-full h-full object-cover">
+                            </div>
+                            <h4 id="studio-preview-name" class="text-xs font-bold text-white mt-2">مول الطاكسي (كازا)</h4>
+                            <p id="studio-preview-desc" class="text-[10px] text-amber-400 mt-0.5">صوت رجولي حاد مع حركات شفاه مغلقة جاهزة للنطق</p>
+                        </div>
+
+                        <div class="w-full mt-4 space-y-2 text-[11px] bg-gray-900/60 p-3 rounded-lg border border-gray-850">
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">محرك Lip-Sync:</span>
+                                <span class="text-emerald-400 font-bold">Wav2Lip ZeroGPU</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">محرك الصوت:</span>
+                                <span class="text-blue-400 font-bold">RubberBand Pitch (0.70x)</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">الترجمة والبانر:</span>
+                                <span class="text-amber-400 font-bold">عاجل RTL مع كابسول ملونة</span>
+                            </div>
+                        </div>
+
+                        <div class="w-full mt-3 text-center">
+                            <span class="text-[10px] text-gray-500">جاهز للإرسال الفوري لـ GitHub Actions</span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Video Generation Pipeline Live Queue -->
+                <div class="mt-6 pt-5 border-t border-gray-800">
+                    <h3 class="text-xs font-bold text-white mb-3 flex items-center gap-2">
+                        📋 قائمة مهام الإنتاج والتوليد السحابي (Active Queue)
+                    </h3>
+                    <div id="studio-queue-container" class="space-y-2.5">
+                        <!-- Populated dynamically via /api/manual_queue -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ================= TAB 3: GALLERY & PLAYER STUDIO ================= -->
         <div id="tab-content-gallery" class="tab-content hidden space-y-6">
             <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-5 border-b border-gray-800 pb-4">
@@ -206,7 +342,7 @@
             </div>
         </div>
 
-        <!-- ================= TAB 3: CHARACTERS STUDIO ================= -->
+        <!-- ================= TAB 4: CHARACTERS STUDIO ================= -->
         <div id="tab-content-characters" class="tab-content hidden space-y-6">
             <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
                 <div class="flex items-center justify-between mb-4 border-b border-gray-800 pb-3">
@@ -224,7 +360,7 @@
             </div>
         </div>
 
-        <!-- ================= TAB 4: SCHEDULE & TIMETABLE ================= -->
+        <!-- ================= TAB 5: SCHEDULE & TIMETABLE ================= -->
         <div id="tab-content-schedule" class="tab-content hidden space-y-6">
             <div class="bg-gray-900 border border-gray-800 rounded-xl p-5">
                 <div class="flex items-center justify-between mb-4 border-b border-gray-800 pb-3">
@@ -242,7 +378,7 @@
             </div>
         </div>
 
-        <!-- ================= TAB 5: SYSTEM HEALTH & DEEP ANALYSIS ================= -->
+        <!-- ================= TAB 6: SYSTEM HEALTH & DEEP ANALYSIS ================= -->
         <div id="tab-content-health" class="tab-content hidden space-y-6">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 
@@ -343,6 +479,17 @@
         let cachedTopics = [];
         let cachedGallery = [];
         let cachedScripts = [];
+        let cachedQueue = [];
+
+        const characterMetadata = {
+            moul_taxi: { name: "مول الطاكسي (كازا)", img: "output/characters/moul_taxi.jpg", desc: "صوت رجولي حاد مع حركات شفاه مغلقة جاهزة للنطق", audio: "output/test_taxi_voice.mp3" },
+            ba_rahal: { name: "با رحال (الفلاح)", img: "output/characters/ba_rahal_farmer.jpg", desc: "صوت بدوي جهوري (أخبار الفلاحة والجفاف)", audio: "output/test_taxi_voice.mp3" },
+            moul_hanout: { name: "مول الحانوت (سوس)", img: "output/characters/moul_hanout.jpg", desc: "صوت تجاري ساخر (الأسعار والتضخم والكناش)", audio: "output/test_taxi_voice.mp3" },
+            mi_aicha: { name: "مي عيشة (ربة بيت)", img: "output/characters/mi_aicha_housewife.jpg", desc: "صوت نسائي مغربي نقي ومتحمس (قفة السوق)", audio: "output/test_female_voice.mp3" },
+            oustad_teacher: { name: "الأستاذ (رجل التعليم)", img: "output/characters/oustad_teacher.jpg", desc: "صوت مثقف صبور (التعليم والمدارس)", audio: "output/test_taxi_voice.mp3" },
+            tabib_doctor: { name: "طبيب المستعجلات", img: "output/characters/tabib_doctor.jpg", desc: "صوت متعب ومباشر (الصحة ونقص الأدوية)", audio: "output/test_taxi_voice.mp3" },
+            official_minister: { name: "المسؤول الحكومي", img: "output/characters/official_minister.jpg", desc: "صوت باريتون رخيم (تبرير القرارات ولغة الخشب)", audio: "output/test_official_voice.mp3" }
+        };
 
         function showToast(message) {
             const toast = document.getElementById('toast');
@@ -378,6 +525,75 @@
                 activeBtn.classList.remove('bg-gray-800/70', 'text-gray-300');
                 activeBtn.classList.add('bg-red-600', 'text-white');
             }
+        }
+
+        function updateStudioPreview() {
+            const select = document.getElementById('studio-citizen-char');
+            const val = select.value;
+            const meta = characterMetadata[val] || characterMetadata.moul_taxi;
+            document.getElementById('studio-preview-img').src = meta.img;
+            document.getElementById('studio-preview-name').innerText = meta.name;
+            document.getElementById('studio-preview-desc').innerText = meta.desc;
+        }
+
+        function previewAudioFormant() {
+            const select = document.getElementById('studio-citizen-char');
+            const val = select.value;
+            const meta = characterMetadata[val] || characterMetadata.moul_taxi;
+            playCharacterAudio(meta.audio, meta.name);
+        }
+
+        function populateStudioFromTopic(title) {
+            document.getElementById('studio-headline').value = title;
+            document.getElementById('studio-dialogue-hook').value = `وا عباد الله! واش كتضحكو علينا ولا شنو؟! قالك "${title}"! واش هادشي كيعقل عليه بنادم؟!`;
+            
+            // Contextual character selection
+            if (title.includes('فلاح') || title.includes('سدود') || title.includes('جفاف') || title.includes('حليب')) {
+                document.getElementById('studio-citizen-char').value = 'ba_rahal';
+            } else if (title.includes('أسعار') || title.includes('درهم') || title.includes('ضرائب') || title.includes('غلاء')) {
+                document.getElementById('studio-citizen-char').value = 'moul_hanout';
+            } else if (title.includes('سوق') || title.includes('خضر') || title.includes('مطيشة')) {
+                document.getElementById('studio-citizen-char').value = 'mi_aicha';
+            } else if (title.includes('تعليم') || title.includes('أستاذ') || title.includes('مدرسة')) {
+                document.getElementById('studio-citizen-char').value = 'oustad_teacher';
+            } else if (title.includes('صحة') || title.includes('أدوية') || title.includes('مستشفى')) {
+                document.getElementById('studio-citizen-char').value = 'tabib_doctor';
+            } else {
+                document.getElementById('studio-citizen-char').value = 'moul_taxi';
+            }
+            updateStudioPreview();
+            switchTab('studio');
+            showToast('تم تحميل بيانات الخبر في استوديو التوليد! 🎬');
+        }
+
+        function queueAndGenerateEpisode() {
+            const headline = (document.getElementById('studio-headline').value || '').trim();
+            if (!headline) {
+                showToast('يرجى كتابة عنوان للحلقة أولاً!');
+                return;
+            }
+            const charKey = document.getElementById('studio-citizen-char').value;
+            const charMeta = characterMetadata[charKey] || characterMetadata.moul_taxi;
+            
+            const newJob = {
+                id: 'job_' + Date.now().toString().slice(-4),
+                headline: headline,
+                character: charMeta.name + ' vs المسؤول',
+                voice_pitch: charKey === 'mi_aicha' ? 'Feminine Expressive (1.10x)' : 'Masculine Energetic (0.70x)',
+                motion: 'Kinetic Punch-Zoom (' + document.getElementById('studio-camera').value + 'x)',
+                status: 'تم الإرسال للمحرك السحابي ⚡',
+                duration: '40s تقريباً',
+                timestamp: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+            };
+            
+            cachedQueue.unshift(newJob);
+            renderQueue(cachedQueue);
+            showToast('تم إدراج الحلقة في قائمة التوليد السحابي! 🚀');
+            
+            // Trigger GitHub Actions dispatch
+            setTimeout(() => {
+                window.open("https://github.com/slimanix/morocco-tiktok-studio/actions/workflows/daily_tiktok_factory.yml", "_blank");
+            }, 1000);
         }
 
         function playInMainPlayer(videoSrc, title) {
@@ -437,9 +653,14 @@
                     <span class="text-[11px] font-bold bg-gray-800 text-gray-300 w-5 h-5 rounded flex items-center justify-center shrink-0 mt-0.5">${idx+1}</span>
                     <div class="flex-1">
                         <p class="text-xs font-semibold text-gray-200 leading-snug">${t.title}</p>
-                        <div class="flex items-center justify-between mt-1.5">
+                        <div class="flex items-center justify-between mt-2">
                             <span class="text-[10px] text-amber-400">[${t.category || 'خبر عام'} • هسبريس]</span>
-                            <button onclick="copyToClipboard('${t.title.replace(/'/g, "\\'")}', 'تم نسخ عنوان الخبر!')" class="text-[10px] text-gray-400 hover:text-white bg-gray-900 border border-gray-800 px-2 py-0.5 rounded">نسخ 📋</button>
+                            <div class="flex items-center gap-1.5">
+                                <button onclick="populateStudioFromTopic('${t.title.replace(/'/g, "\\'")}')" class="text-[10px] text-red-400 hover:text-white bg-red-950/60 border border-red-800/80 hover:bg-red-800 px-2 py-0.5 rounded font-bold transition flex items-center gap-1">
+                                    <span>⚡ إنتاج فيديو</span>
+                                </button>
+                                <button onclick="copyToClipboard('${t.title.replace(/'/g, "\\'")}', 'تم نسخ عنوان الخبر!')" class="text-[10px] text-gray-400 hover:text-white bg-gray-900 border border-gray-800 px-2 py-0.5 rounded">نسخ 📋</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -477,6 +698,30 @@
             `).join('');
         }
 
+        function renderQueue(queueList) {
+            const container = document.getElementById('studio-queue-container');
+            if (!container) return;
+            if (!queueList || queueList.length === 0) {
+                container.innerHTML = '<p class="text-xs text-gray-500 text-center py-4">لا توجد مهام إنتاج حالية في القائمة</p>';
+                return;
+            }
+            container.innerHTML = queueList.map(q => `
+                <div class="p-3 bg-gray-950 border border-gray-800/80 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                    <div class="flex items-center gap-3">
+                        <span class="text-[11px] font-mono bg-gray-900 border border-gray-800 px-2 py-1 rounded text-gray-400">${q.id}</span>
+                        <div>
+                            <h4 class="text-xs font-bold text-white">${q.headline}</h4>
+                            <p class="text-[10px] text-gray-400 mt-0.5">${q.character} • ${q.voice_pitch} • ${q.motion}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 self-end sm:self-auto text-[10px]">
+                        <span class="text-gray-500">${q.timestamp}</span>
+                        <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded font-bold">${q.status}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
         async function refreshDashboard() {
             try {
                 // 1. Account State
@@ -502,7 +747,7 @@
                             <div class="flex items-center justify-between mb-2">
                                 <span class="text-xs font-bold text-red-400">حلقة ${s.episode_id || idx+1}: ${s.headline}</span>
                                 <div class="flex items-center gap-1.5">
-                                    <span class="text-[10px] bg-gray-800 text-gray-400 px-2 py-0.5 rounded">دارجة ساخرة</span>
+                                    <button onclick="populateStudioFromTopic('${s.headline.replace(/'/g, "\\'")}')" class="text-[10px] bg-red-950/80 border border-red-800 text-red-300 px-2 py-0.5 rounded font-bold hover:bg-red-800 transition">⚡ إنتاج فيديو</button>
                                     <button onclick="copyToClipboard('${s.headline.replace(/'/g, "\\'")}', 'تم نسخ عنوان الحلقة!')" class="text-[10px] bg-gray-800 hover:bg-gray-700 text-gray-300 px-1.5 py-0.5 rounded">📋</button>
                                 </div>
                             </div>
@@ -567,12 +812,22 @@
                     renderGallery(gallery);
                 }
 
+                // 7. Manual Queue
+                const queue = await fetchWithFallback('/api/manual_queue', 'output/manual_queue.json');
+                if (Array.isArray(queue) && queue.length > 0) {
+                    cachedQueue = queue;
+                    renderQueue(queue);
+                }
+
             } catch (err) {
                 console.error("Dashboard sync error:", err);
             }
         }
 
-        document.addEventListener('DOMContentLoaded', refreshDashboard);
+        document.addEventListener('DOMContentLoaded', () => {
+            refreshDashboard();
+            updateStudioPreview();
+        });
         setInterval(refreshDashboard, 8000);
     </script>
 </body>

@@ -85,6 +85,15 @@ class handler(BaseHTTPRequestHandler):
             self.wfile.write(json.dumps(data, ensure_ascii=False).encode("utf-8"))
             return
 
+        elif clean_path == "/api/manual_queue":
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
+            self.end_headers()
+            data = fetch_live_json("output/manual_queue.json", [])
+            self.wfile.write(json.dumps(data, ensure_ascii=False).encode("utf-8"))
+            return
+
         # 2. Static Files & Dashboard HTML
         if clean_path in ["/", "/index.html"]:
             target_file = "index.html"
