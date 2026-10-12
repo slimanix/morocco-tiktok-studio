@@ -28,6 +28,53 @@ def run_daily_batch(limit=20):
     # 2. Generate Scripts
     print("\n[Phase 2/3] Writing Satirical Darija Scripts...")
     scripts = generate_scripts_from_topics()[:limit]
+
+    # Prepend any Studio custom queue jobs (User studio requests)
+    queue_file = "output/manual_queue.json"
+    if os.path.exists(queue_file):
+        try:
+            with open(queue_file, "r", encoding="utf-8") as f:
+                queue_jobs = json.load(f)
+            custom_eps = []
+            for q_idx, q in enumerate(queue_jobs, 1):
+                if q.get("status", "").startswith("مكتمل"):
+                    continue
+                q_head = q.get("headline", "")
+                if not q_head:
+                    continue
+                # Determine character archetype from queue
+                q_char = q.get("character_key") or "teacher"
+                if "oustad" in q.get("character", "") or "الأستاذ" in q.get("character", ""):
+                    q_char = "teacher"
+                elif "mi_aicha" in q.get("character", "") or "مي عيشة" in q.get("character", ""):
+                    q_char = "housewife"
+                elif "ba_rahal" in q.get("character", "") or "الفلاح" in q.get("character", ""):
+                    q_char = "farmer"
+                elif "hanout" in q.get("character", "") or "الحانوت" in q.get("character", ""):
+                    q_char = "grocer"
+                elif "tabib" in q.get("character", "") or "طبيب" in q.get("character", ""):
+                    q_char = "doctor"
+
+                q_hook = q.get("hook") or f"وا عباد الله! واش كتضحكو علينا ولا شنو؟! قالك {q_head}! واش هادشي كيعقل عليه بنادم؟!"
+                custom_eps.append({
+                    "episode_id": f"studio_{q.get('id', q_idx)}",
+                    "headline": q_head,
+                    "custom_character": q_char,
+                    "subtitle_style": q.get("subtitle_style", "yellow_glow"),
+                    "zoom_factor": float(q.get("zoom_factor", 1.10)),
+                    "dialogue": [
+                        {"speaker": "المواطن (معصب ومصدوم)", "voice_speaker": "المواطن", "text": q_hook},
+                        {"speaker": "المسؤول (كيبرّد الطرح)", "voice_speaker": "المسؤول", "text": "الله يهديك أ سيدي المواطن! نقص من الحماس. هادي راه استراتيجية مندمجة باش نحميو التوازن العام!"},
+                        {"speaker": "المواطن (الصدمة الثانية)", "voice_speaker": "المواطن", "text": "التوازن الوحيد لي طاح هو جيبي لي خوا! فاش كتشرحو هادشي كدوخو لينا راسنا بالفرنسية والإحصائيات!"},
+                        {"speaker": "المسؤول (بابتسامة برود)", "voice_speaker": "المسؤول", "text": "إيوا شفتي؟ هذا هو النموذج التنموي الجديد! خليونا نخدمو وباراكا من الشكوى!"},
+                        {"speaker": "الخاتمة (الجدل)", "voice_speaker": "المواطن", "text": "وانتوما فليكومونتير، واش نتوما مع كلام المسؤول ولا مع المواطن؟ صوتو دابا!"}
+                    ]
+                })
+            if custom_eps:
+                print(f"🎯 Loaded {len(custom_eps)} custom Studio episodes from queue!")
+                scripts = custom_eps + scripts
+        except Exception as e:
+            print(f"⚠️ Queue load error: {e}")
     
     # 3. Produce Episodes
     print(f"\n[Phase 3/3] Producing {len(scripts)} Full Video Episodes...")
@@ -84,6 +131,7 @@ def run_daily_batch(limit=20):
             rendered_raw = list(executor.map(process_single_scene, scene_tasks))
             
         # 2. Burn individual dynamic subtitles, badges & headline on each scene
+        sub_style = ep.get("subtitle_style", "yellow_glow")
         enhanced_scenes = []
         for task in scene_tasks:
             raw_v = task["output_path"]
@@ -94,7 +142,8 @@ def run_daily_batch(limit=20):
                     subtitle_text=task["text"],
                     speaker_name=task["speaker_badge"],
                     output_video_path=enh_v,
-                    banner_title=f"عاجل | {headline[:40]}"
+                    banner_title=f"عاجل | {headline[:40]}",
+                    style=sub_style
                 )
                 enhanced_scenes.append(enh_v)
             except Exception as e:
@@ -108,8 +157,9 @@ def run_daily_batch(limit=20):
         # 4. Apply Kinetic Camera Punch-Zoom
         from kinetic_camera import apply_kinetic_zoom
         final_ep_video = f"{batch_dir}/episode_{ep_id}.mp4"
+        zoom_val = float(ep.get("zoom_factor", 1.10))
         try:
-            apply_kinetic_zoom(raw_concat_video, final_ep_video, zoom_factor=1.10)
+            apply_kinetic_zoom(raw_concat_video, final_ep_video, zoom_factor=zoom_val)
         except Exception as e:
             print(f"⚠️ Kinetic zoom fallback: {e}")
             import shutil

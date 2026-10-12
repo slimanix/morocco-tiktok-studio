@@ -847,16 +847,20 @@
             const charKey = document.getElementById('studio-citizen-char').value;
             const charMeta = characterMetadata[charKey] || characterMetadata.moul_taxi;
             const subStyle = document.getElementById('studio-subtitle-style').value;
-            const sfxChoice = document.getElementById('studio-sfx').value;
-            const bgmChoice = document.getElementById('studio-bgm').value;
+            const hookVal = (document.getElementById('studio-dialogue-hook').value || '').trim();
+            const camZoom = document.getElementById('studio-camera') ? document.getElementById('studio-camera').value : '1.10';
             
             const newJob = {
                 id: 'job_' + Date.now().toString().slice(-4),
                 headline: headline,
                 character: charMeta.name + ' vs المسؤول',
+                character_key: charKey,
+                hook: hookVal,
+                subtitle_style: subStyle,
+                zoom_factor: parseFloat(camZoom) || 1.10,
                 voice_pitch: charKey === 'mi_aicha' ? 'Feminine Expressive (Pitch 1.12)' : (charKey === 'official_minister' ? 'Baritone (0.60)' : 'Masculine (0.74)'),
-                motion: 'Kinetic Punch-Zoom (' + document.getElementById('studio-camera').value + 'x)',
-                style: subStyle === 'yellow_glow' ? 'Viral Yellow' : 'Red Pill',
+                motion: 'Kinetic Punch-Zoom (' + camZoom + 'x)',
+                style: subStyle === 'yellow_glow' ? 'Viral Yellow' : (subStyle === 'red_pill' ? 'Red Pill' : 'Emerald Green'),
                 audio_fx: `${sfxChoice} + ${bgmChoice}`,
                 status: 'في انتظار الضغط على Run workflow في GitHub ⏳',
                 duration: '40s تقريباً',

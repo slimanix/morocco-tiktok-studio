@@ -32,14 +32,21 @@ def get_arabic_font(size):
                 pass
     return ImageFont.load_default()
 
+import textwrap
+
 def reshape_arabic(text):
     try:
-        reshaped = arabic_reshaper.reshape(text)
-        return get_display(reshaped)
+        # Wrap words properly to avoid truncating words
+        lines = textwrap.wrap(text, width=36)
+        reshaped_lines = []
+        for line in lines:
+            reshaped = arabic_reshaper.reshape(line)
+            reshaped_lines.append(get_display(reshaped))
+        return reshaped_lines
     except Exception:
-        return text
+        return [text]
 
-def apply_tiktok_overlays(input_video_path, subtitle_text, speaker_name, output_video_path, banner_title="عاجل | نقاش وطني حول الأخبار اليومية 🇲🇦"):
+def apply_tiktok_overlays(input_video_path, subtitle_text, speaker_name, output_video_path, banner_title="عاجل | نقاش وطني حول الأخبار اليومية 🇲🇦", style="yellow_glow"):
     """
     Overlays breaking news banner, speaker badge, and bold RTL Arabic subtitles
     directly onto a lip-synced video clip.
@@ -48,26 +55,36 @@ def apply_tiktok_overlays(input_video_path, subtitle_text, speaker_name, output_
     source_clip = VideoFileClip(input_video_path)
     width, height = source_clip.size
     
-    font_sub = get_arabic_font(int(height * 0.034))
-    font_badge = get_arabic_font(int(height * 0.028))
+    font_sub = get_arabic_font(int(height * 0.033))
+    font_badge = get_arabic_font(int(height * 0.026))
     font_banner = get_arabic_font(int(height * 0.022))
     
-    reshaped_speaker = reshape_arabic(speaker_name)
-    reshaped_banner = reshape_arabic(banner_title[:45])
+    reshaped_speaker_list = reshape_arabic(speaker_name)
+    reshaped_speaker = reshaped_speaker_list[0] if reshaped_speaker_list else speaker_name
     
-    # Official = Blue, All Citizen Archetypes (Taxi, Grocer, Farmer, etc.) = Amber Gold
+    reshaped_banner_list = reshape_arabic(banner_title[:45])
+    reshaped_banner = reshaped_banner_list[0] if reshaped_banner_list else banner_title
+    
+    # Official = Blue, All Citizen Archetypes (Taxi, Grocer, Farmer, Teacher, etc.) = Amber Gold
     is_official = "المسؤول" in speaker_name or "وزير" in speaker_name
     badge_color = (0, 140, 255) if is_official else (255, 185, 20)
     
-    # Subtitle splitting for long lines
-    words = subtitle_text.split()
-    if len(words) > 7:
-        mid = len(words) // 2
-        line1 = reshape_arabic(" ".join(words[:mid]))
-        line2 = reshape_arabic(" ".join(words[mid:]))
-        sub_lines = [line1, line2]
-    else:
-        sub_lines = [reshape_arabic(subtitle_text)]
+    # Subtitle lines reshaped safely line-by-line
+    sub_lines = reshape_arabic(subtitle_text)
+    
+    # Styling options from Studio
+    if style == "red_pill":
+        box_bg = (220, 38, 38, 235)
+        text_color = (255, 255, 255)
+        border_color = (255, 255, 255)
+    elif style == "green_emerald":
+        box_bg = (6, 78, 59, 230)
+        text_color = (110, 231, 183)
+        border_color = (52, 211, 153)
+    else: # default: yellow_glow
+        box_bg = (0, 0, 0, 215)
+        text_color = (255, 240, 50)
+        border_color = (250, 204, 21)
     
     def transform_frame(get_frame, t):
         frame = get_frame(t)
@@ -86,22 +103,27 @@ def apply_tiktok_overlays(input_video_path, subtitle_text, speaker_name, output_
         
         # Live red pulse dot inside badge
         dot_r = int(height * 0.006)
-        draw.ellipse([width // 2 + bw - 28, badge_y - dot_r, width // 2 + bw - 28 + dot_r * 2, badge_y + dot_r], fill=(220, 30, 30))
+        draw.ellipse([width // 2 + bw - 26, badge_y - dot_r, width // 2 + bw - 26 + dot_r * 2, badge_y + dot_r], fill=(220, 30, 30))
         
         draw.text((width // 2 - 8, badge_y), reshaped_speaker, font=font_badge, fill="black", anchor="mm")
         
         # 3. Bottom TikTok Subtitle Box
-        sub_y = int(height * 0.86)
+        line_height = int(height * 0.040)
+        box_h = line_height * len(sub_lines) + 16
         box_w = int(width * 0.46)
-        box_h = int(height * 0.038) * len(sub_lines)
-        draw.rounded_rectangle([width // 2 - box_w, sub_y - box_h // 2 - 8, width // 2 + box_w, sub_y + box_h // 2 + 8], radius=18, fill=(0, 0, 0, 210))
+        sub_center_y = int(height * 0.86)
         
-        if len(sub_lines) == 1:
-            draw.text((width // 2, sub_y), sub_lines[0], font=font_sub, fill=(255, 240, 50), anchor="mm")
-        else:
-            spacing = int(height * 0.038)
-            draw.text((width // 2, sub_y - spacing // 2), sub_lines[0], font=font_sub, fill=(255, 240, 50), anchor="mm")
-            draw.text((width // 2, sub_y + spacing // 2), sub_lines[1], font=font_sub, fill=(255, 240, 50), anchor="mm")
+        draw.rounded_rectangle(
+            [width // 2 - box_w, sub_center_y - box_h // 2, width // 2 + box_w, sub_center_y + box_h // 2],
+            radius=18,
+            fill=box_bg,
+            outline=border_color,
+            width=2
+        )
+        
+        start_y = sub_center_y - (len(sub_lines) - 1) * (line_height // 2)
+        for idx, line in enumerate(sub_lines):
+            draw.text((width // 2, start_y + idx * line_height), line, font=font_sub, fill=text_color, anchor="mm")
         
         return np.array(img)
 
