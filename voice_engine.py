@@ -77,6 +77,9 @@ def synthesize_audio(text, speaker, output_file, gender=None, archetype_role=Non
     else:
         # Default citizen: Moul Taxi (angry, energetic, high pitch shift)
         audio_filter = "rubberband=pitch=0.74:tempo=1.24,equalizer=f=140:t=q:w=1:g=7,equalizer=f=2800:t=q:w=1:g=4"
+
+    # Append TikTok punchy loudness normalization filter to ensure loud, crisp audio
+    audio_filter += ",volume=5.5dB,loudnorm=I=-14:TP=-1:LRA=11"
         
     cmd = [
         ffmpeg_exe, "-y",
