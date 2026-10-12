@@ -596,99 +596,26 @@
             }, 1000);
         }
 
+        function resolveVideoUrl(src) {
+            if (!src) return 'output/test_official_with_subtitles.mp4';
+            if (src.startsWith('http')) return src;
+            // On production Vercel, batch folders are streamed directly from GitHub Raw CDN
+            if (src.includes('batch_')) {
+                return `${GITHUB_RAW_BASE}/${src}`;
+            }
+            return src;
+        }
+
         function playInMainPlayer(videoSrc, title) {
             const player = document.getElementById('main-video-player');
-            player.src = videoSrc;
-            player.play();
+            const resolved = resolveVideoUrl(videoSrc);
+            player.src = resolved;
+            player.load();
+            player.play().catch(() => {});
             document.getElementById('current-video-title').innerText = title;
             switchTab('overview');
             window.scrollTo({ top: 150, behavior: 'smooth' });
-            showToast(`جاري تشغيل: ${title}`);
-        }
-
-        function playCharacterAudio(audioSrc, charName) {
-            const audio = document.getElementById('character-audio-player');
-            const cleanPath = audioSrc.startsWith('http') ? audioSrc : `${window.location.origin}/${audioSrc}`;
-            const ghFallback = `${GITHUB_RAW_BASE}/${audioSrc}`;
-            
-            audio.src = cleanPath;
-            showToast(`جاري تشغيل عينة: ${charName} 🔊`);
-            
-            audio.play().catch(() => {
-                // Try fallback to GitHub Raw directly
-                audio.src = ghFallback;
-                audio.play().catch(() => {
-                    // Fallback to Web Speech API in Arabic
-                    if ('speechSynthesis' in window) {
-                        const utterance = new SpeechSynthesisUtterance(
-                            charName.includes('المسؤول') 
-                                ? 'الله يهديك أ سيدي المواطن، هذه استراتيجية مندمجة!' 
-                                : 'وا عباد الله! واش كتضحكو علينا ولا شنو؟!'
-                        );
-                        utterance.lang = 'ar-XA';
-                        utterance.pitch = charName.includes('المسؤول') ? 0.7 : (charName.includes('عيشة') ? 1.2 : 0.85);
-                        utterance.rate = 1.05;
-                        window.speechSynthesis.speak(utterance);
-                        showToast(`تشغيل عبر محاكي النطق: ${charName} 🎙️`);
-                    } else {
-                        showToast(`تعذر تشغيل الملف الصوتي: ${charName}`);
-                    }
-                });
-            });
-        }
-
-        async function fetchWithFallback(endpoint, rawPath) {
-            try {
-                const res = await fetch(endpoint + '?t=' + Date.now());
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data && (Array.isArray(data) ? data.length > 0 : Object.keys(data).length > 0)) {
-                        return data;
-                    }
-                }
-            } catch (e) {}
-            try {
-                const ghRes = await fetch(`${GITHUB_RAW_BASE}/${rawPath}?t=` + Date.now());
-                if (ghRes.ok) return await ghRes.json();
-            } catch (e) {}
-            return null;
-        }
-
-        function triggerImmediateRun() {
-            window.open("https://github.com/slimanix/morocco-tiktok-studio/actions/workflows/daily_tiktok_factory.yml", "_blank");
-        }
-
-        function filterTopics() {
-            const query = (document.getElementById('topic-search').value || '').trim().toLowerCase();
-            const container = document.getElementById('topics-container');
-            const filtered = cachedTopics.filter(t => t.title.toLowerCase().includes(query) || (t.category && t.category.toLowerCase().includes(query)));
-            renderTopics(filtered);
-        }
-
-        function renderTopics(topicsList) {
-            const container = document.getElementById('topics-container');
-            document.getElementById('topics-count').innerText = `${topicsList.length} موضوعاً`;
-            if (topicsList.length === 0) {
-                container.innerHTML = '<p class="text-xs text-gray-500 text-center py-6">لم يتم العثور على مواضيع مطابقة</p>';
-                return;
-            }
-            container.innerHTML = topicsList.map((t, idx) => `
-                <div class="p-3 bg-gray-950/70 rounded-lg border border-gray-800/80 hover:border-gray-700 transition flex items-start gap-2.5">
-                    <span class="text-[11px] font-bold bg-gray-800 text-gray-300 w-5 h-5 rounded flex items-center justify-center shrink-0 mt-0.5">${idx+1}</span>
-                    <div class="flex-1">
-                        <p class="text-xs font-semibold text-gray-200 leading-snug">${t.title}</p>
-                        <div class="flex items-center justify-between mt-2">
-                            <span class="text-[10px] text-amber-400">[${t.category || 'خبر عام'} • هسبريس]</span>
-                            <div class="flex items-center gap-1.5">
-                                <button onclick="populateStudioFromTopic('${t.title.replace(/'/g, "\\'")}')" class="text-[10px] text-red-400 hover:text-white bg-red-950/60 border border-red-800/80 hover:bg-red-800 px-2 py-0.5 rounded font-bold transition flex items-center gap-1">
-                                    <span>⚡ إنتاج فيديو</span>
-                                </button>
-                                <button onclick="copyToClipboard('${t.title.replace(/'/g, "\\'")}', 'تم نسخ عنوان الخبر!')" class="text-[10px] text-gray-400 hover:text-white bg-gray-900 border border-gray-800 px-2 py-0.5 rounded">نسخ 📋</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `).join('');
+            showToast(`جاري تشغيل: ${title} 🎬`);
         }
 
         function filterGallery(filterType) {
@@ -702,24 +629,46 @@
 
         function renderGallery(galleryList) {
             const container = document.getElementById('gallery-container');
-            container.innerHTML = galleryList.map(g => `
+            container.innerHTML = galleryList.map((g, idx) => {
+                const vidUrl = resolveVideoUrl(g.video_src);
+                return `
                 <div class="bg-gray-950 border border-gray-800 rounded-xl overflow-hidden flex flex-col p-3 hover:border-gray-700 transition">
                     <div class="aspect-[9/16] bg-black rounded-lg overflow-hidden border border-gray-850 relative mb-3 group cursor-pointer" onclick="playInMainPlayer('${g.video_src}', '${g.title.replace(/'/g, "\\'")}')">
-                        <video class="w-full h-full object-contain pointer-events-none" preload="metadata">
-                            <source src="${g.video_src}" type="video/mp4">
+                        <video class="w-full h-full object-contain" poster="output/characters/moul_taxi.jpg" preload="none">
+                            <source src="${vidUrl}" type="video/mp4">
                         </video>
-                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                            <span class="text-2xl bg-red-600/90 text-white w-10 h-10 rounded-full flex items-center justify-center shadow-lg">▶</span>
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-2.5">
+                            <div class="flex items-center justify-between">
+                                <span class="text-[10px] bg-red-600/90 text-white font-bold px-2 py-0.5 rounded">حلقة ${g.id || idx+1}</span>
+                                <span class="text-xs bg-black/60 text-white w-7 h-7 rounded-full flex items-center justify-center border border-gray-700 group-hover:scale-110 transition">▶</span>
+                            </div>
                         </div>
                     </div>
                     <h4 class="text-xs font-bold text-white line-clamp-1">${g.title}</h4>
                     <p class="text-[10px] text-gray-400 mt-0.5">${g.characters}</p>
                     <div class="flex items-center justify-between mt-2 pt-2 border-t border-gray-800 text-[10px] text-gray-500">
                         <span>⏱️ ${g.duration}</span>
-                        <span class="text-emerald-400 font-semibold">${g.badge}</span>
+                        <button onclick="playInMainPlayer('${g.video_src}', '${g.title.replace(/'/g, "\\'")}')" class="text-red-400 font-bold hover:underline">تشغيل ⚡</button>
                     </div>
                 </div>
-            `).join('');
+            `;
+            }).join('');
+        }
+
+        function playCharacterAudio(audioSrc, charName) {
+            const audio = document.getElementById('character-audio-player');
+            const cleanPath = audioSrc.startsWith('http') ? audioSrc : `${window.location.origin}/${audioSrc}`;
+            const ghFallback = `${GITHUB_RAW_BASE}/${audioSrc}`;
+            
+            audio.src = cleanPath;
+            showToast(`جاري تشغيل عينة: ${charName} 🔊`);
+            
+            audio.play().catch(() => {
+                audio.src = ghFallback;
+                audio.play().catch(() => {
+                    showToast(`تعذر تشغيل الصوت: ${charName}`);
+                });
+            });
         }
 
         function renderQueue(queueList) {
