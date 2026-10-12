@@ -255,52 +255,118 @@
                             </div>
                         </div>
 
+                        <!-- Subtitle Styling, Sound FX & Music Controls -->
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-300 mb-1.5">ستايل الكلمات والترجمة:</label>
+                                <select id="studio-subtitle-style" onchange="updateLiveSubtitlesPreview()" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500">
+                                    <option value="yellow_glow">أصفر ناري مشع (TikTok Viral) ✨</option>
+                                    <option value="red_pill">كابسولة حمراء مع إطار أبيض 🔴</option>
+                                    <option value="green_cyber">أخضر زمردي بارز 🟢</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-300 mb-1.5">المؤثرات الصوتية والدراما (SFX):</label>
+                                <select id="studio-sfx" onchange="updateStudioTelemetry()" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500">
+                                    <option value="dramatic_boom">صدمة دراماتيكية (Boom & Whoosh) 💥</option>
+                                    <option value="record_scratch">خدش الأسطوانة والضحك (Record Scratch) 🎶</option>
+                                    <option value="subtle_hits">ضربات إيقاع خفيفة (Subtle Accents) 🥁</option>
+                                    <option value="none">بدون مؤثرات إضافية (صوت الحوار فقط)</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-300 mb-1.5">موسيقى الخلفية الخفيفة (BGM):</label>
+                                <select id="studio-bgm" onchange="updateStudioTelemetry()" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500">
+                                    <option value="moroccan_tension">تشويق ووتريات مغربية هادئة (-22dB) 🎻</option>
+                                    <option value="drill_subtle">إيقاع حماسي بطيء (Modern Lo-Fi Drill) ⚡</option>
+                                    <option value="none">بدون موسيقى تصويرية</option>
+                                </select>
+                            </div>
+                        </div>
+
                         <!-- Custom Dialogue Hook (Optional) -->
                         <div>
-                            <label class="block text-xs font-bold text-gray-300 mb-1.5">افتتاحية الحوار (Hook Darija):</label>
-                            <textarea id="studio-dialogue-hook" rows="3" placeholder="وا عباد الله! واش كتضحكو علينا ولا شنو؟! قالك التوازن المالي وحنا الجيب تقبوه بالزيادات!" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-red-500 leading-relaxed"></textarea>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label class="block text-xs font-bold text-gray-300">افتتاحية الحوار (Hook Darija):</label>
+                                <div class="flex items-center gap-1.5">
+                                    <button type="button" onclick="autoGenerateHook()" class="text-[10px] bg-red-950/60 border border-red-800 text-red-300 hover:text-white px-2 py-0.5 rounded font-bold transition flex items-center gap-1">
+                                        <span>✨ توليد هوك ذكي تلقائياً</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <textarea id="studio-dialogue-hook" oninput="updateLiveSubtitlesPreview()" rows="3" placeholder="وا عباد الله! واش كتضحكو علينا ولا شنو؟! قالك التوازن المالي وحنا الجيب تقبوه بالزيادات!" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-2 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-red-500 leading-relaxed"></textarea>
                         </div>
 
                         <!-- Action Buttons -->
                         <div class="flex flex-wrap items-center gap-3 pt-2">
                             <button onclick="queueAndGenerateEpisode()" class="flex-1 bg-red-600 hover:bg-red-500 active:scale-95 text-white font-black py-3 px-6 rounded-xl transition shadow-lg shadow-red-950/60 flex items-center justify-center gap-2 text-xs">
-                                <span>🚀 بدء توليد الحلقة وإرسالها للمحرك السحابي</span>
+                                <span>🚀 بدء توليد وتصدير الحلقة السحابية (100% Free)</span>
                             </button>
                             <button onclick="previewAudioFormant()" class="bg-gray-800 hover:bg-gray-700 text-gray-200 font-bold py-3 px-4 rounded-xl border border-gray-700 transition text-xs flex items-center gap-1.5">
-                                <span>🔊 تجربة نبرة الصوت</span>
+                                <span>🔊 تجربة نبرة الصوت المحددة</span>
                             </button>
                         </div>
 
                     </div>
 
-                    <!-- Live Studio Preview Card -->
+                    <!-- Live Studio Interactive Phone Mockup Preview Card -->
                     <div class="bg-gray-950 border border-gray-800 rounded-xl p-4 flex flex-col items-center justify-between">
-                        <div class="w-full text-center">
-                            <span class="text-[10px] bg-gray-900 text-gray-400 border border-gray-800 px-2.5 py-1 rounded-full font-bold">معاينة الشخصية والإعدادات</span>
-                            <div class="w-32 h-32 rounded-2xl overflow-hidden border-2 border-red-500 mt-3 mx-auto shadow-xl">
-                                <img id="studio-preview-img" src="output/characters/moul_taxi.jpg" alt="Preview" class="w-full h-full object-cover">
-                            </div>
-                            <h4 id="studio-preview-name" class="text-xs font-bold text-white mt-2">مول الطاكسي (كازا)</h4>
-                            <p id="studio-preview-desc" class="text-[10px] text-amber-400 mt-0.5">صوت رجولي حاد مع حركات شفاه مغلقة جاهزة للنطق</p>
+                        <div class="w-full flex items-center justify-between mb-2">
+                            <span class="text-[10px] bg-gray-900 text-gray-400 border border-gray-800 px-2.5 py-1 rounded-full font-bold">معاينة الشاشة الحية (9:16)</span>
+                            <span id="studio-fps-tag" class="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded font-mono font-bold">ZeroGPU 30 FPS</span>
                         </div>
 
-                        <div class="w-full mt-4 space-y-2 text-[11px] bg-gray-900/60 p-3 rounded-lg border border-gray-850">
-                            <div class="flex justify-between">
-                                <span class="text-gray-400">محرك Lip-Sync:</span>
-                                <span class="text-emerald-400 font-bold">Wav2Lip ZeroGPU</span>
+                        <!-- Dynamic TikTok Video Screen Mockup -->
+                        <div class="w-full max-w-[210px] aspect-[9/16] bg-black rounded-2xl overflow-hidden border-2 border-red-500/80 relative shadow-2xl flex flex-col justify-between p-2.5 my-2">
+                            <!-- Background Character Image with Kinetic Animation Simulation -->
+                            <img id="studio-preview-img" src="output/characters/moul_taxi.jpg" alt="Preview" class="absolute inset-0 w-full h-full object-cover transition-transform duration-700">
+                            
+                            <!-- Dark Gradient Overlay -->
+                            <div class="absolute inset-0 bg-gradient-to-b from-black/70 via-transparent to-black/85"></div>
+
+                            <!-- Top Breaking News Capsule -->
+                            <div class="relative z-10 text-center">
+                                <span class="bg-red-600 text-white font-black text-[9px] px-2 py-0.5 rounded-full shadow-md animate-pulse">🔴 وا عباد الله • عاجل</span>
+                                <h5 id="mockup-topic-title" class="text-white text-[10px] font-bold mt-1 line-clamp-1 drop-shadow-md">عنوان الحلقة المباشرة</h5>
                             </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-400">محرك الصوت:</span>
-                                <span class="text-blue-400 font-bold">RubberBand Pitch (0.70x)</span>
+
+                            <!-- Live Animated Subtitle Overlay -->
+                            <div class="relative z-10 text-center my-auto px-1">
+                                <div id="mockup-subtitle-box" class="inline-block bg-black/80 px-2.5 py-1.5 rounded-lg border border-yellow-400/80 shadow-lg">
+                                    <span id="mockup-subtitle-text" class="text-yellow-300 font-black text-[11px] leading-tight drop-shadow-md">
+                                        "وا عباد الله! واش كتضحكو علينا ولا شنو؟!"
+                                    </span>
+                                </div>
                             </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-400">الترجمة والبانر:</span>
-                                <span class="text-amber-400 font-bold">عاجل RTL مع كابسول ملونة</span>
+
+                            <!-- Bottom Character Identity Bar -->
+                            <div class="relative z-10 bg-black/75 backdrop-blur-sm p-1.5 rounded-lg border border-gray-800 flex items-center justify-between">
+                                <div>
+                                    <h4 id="studio-preview-name" class="text-[10px] font-bold text-white">مول الطاكسي (كازا)</h4>
+                                    <p id="studio-preview-desc" class="text-[8px] text-amber-400">صوت رجولي حاد (1.24x)</p>
+                                </div>
+                                <span class="text-xs">🚕</span>
                             </div>
                         </div>
 
-                        <div class="w-full mt-3 text-center">
-                            <span class="text-[10px] text-gray-500">جاهز للإرسال الفوري لـ GitHub Actions</span>
+                        <!-- Live Pipeline Telemetry Summary -->
+                        <div class="w-full space-y-1.5 text-[11px] bg-gray-900/60 p-2.5 rounded-lg border border-gray-850 mt-1">
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">حركة الكاميرا:</span>
+                                <span id="telemetry-camera" class="text-emerald-400 font-bold">Punch-Zoom 1.10x</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">نمط الترجمة:</span>
+                                <span id="telemetry-subtitle" class="text-yellow-400 font-bold">أصفر ناري مشع</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span class="text-gray-400">المؤثرات الصوتية:</span>
+                                <span id="telemetry-sfx" class="text-blue-400 font-bold">Boom & Whoosh</span>
+                            </div>
+                        </div>
+
+                        <div class="w-full mt-2 text-center">
+                            <span class="text-[10px] text-gray-500">جاهز للتصدير التلقائي بضغطة زر ⚡</span>
                         </div>
                     </div>
 
@@ -529,11 +595,124 @@
 
         function updateStudioPreview() {
             const select = document.getElementById('studio-citizen-char');
-            const val = select.value;
+            const val = select ? select.value : 'moul_taxi';
             const meta = characterMetadata[val] || characterMetadata.moul_taxi;
-            document.getElementById('studio-preview-img').src = meta.img;
-            document.getElementById('studio-preview-name').innerText = meta.name;
-            document.getElementById('studio-preview-desc').innerText = meta.desc;
+            
+            const imgEl = document.getElementById('studio-preview-img');
+            if (imgEl) imgEl.src = meta.img;
+            
+            const nameEl = document.getElementById('studio-preview-name');
+            if (nameEl) nameEl.innerText = meta.name;
+            
+            const descEl = document.getElementById('studio-preview-desc');
+            if (descEl) descEl.innerText = meta.desc;
+
+            updateLiveSubtitlesPreview();
+            updateStudioTelemetry();
+        }
+
+        function updateStudioTelemetry() {
+            const camEl = document.getElementById('studio-camera');
+            if (camEl) {
+                const teleCam = document.getElementById('telemetry-camera');
+                if (teleCam) teleCam.innerText = `Punch-Zoom ${camEl.value}x`;
+                
+                // Simulate zoom visual in mockup
+                const previewImg = document.getElementById('studio-preview-img');
+                if (previewImg) {
+                    previewImg.style.transform = `scale(${camEl.value})`;
+                }
+            }
+
+            const styleEl = document.getElementById('studio-subtitle-style');
+            if (styleEl) {
+                const teleSub = document.getElementById('telemetry-subtitle');
+                if (teleSub) {
+                    teleSub.innerText = styleEl.options[styleEl.selectedIndex].text.split('(')[0].trim();
+                }
+            }
+
+            const sfxEl = document.getElementById('studio-sfx');
+            if (sfxEl) {
+                const teleSfx = document.getElementById('telemetry-sfx');
+                if (teleSfx) {
+                    teleSfx.innerText = sfxEl.options[sfxEl.selectedIndex].text.split('(')[0].trim();
+                }
+            }
+        }
+
+        function updateLiveSubtitlesPreview() {
+            const headlineInput = document.getElementById('studio-headline');
+            const headline = (headlineInput ? headlineInput.value : '').trim() || "عنوان الحلقة المباشرة";
+            const mockupTitle = document.getElementById('mockup-topic-title');
+            if (mockupTitle) mockupTitle.innerText = headline;
+
+            const hookInput = document.getElementById('studio-dialogue-hook');
+            const hookText = (hookInput && hookInput.value ? hookInput.value : '').trim() || "وا عباد الله! واش كتضحكو علينا ولا شنو؟!";
+            const subText = document.getElementById('mockup-subtitle-text');
+            if (subText) subText.innerText = `"${hookText.slice(0, 75)}${hookText.length > 75 ? '...' : ''}"`;
+
+            const styleSelect = document.getElementById('studio-subtitle-style');
+            const styleVal = styleSelect ? styleSelect.value : 'yellow_glow';
+            const box = document.getElementById('mockup-subtitle-box');
+
+            if (box && subText) {
+                if (styleVal === 'yellow_glow') {
+                    box.className = "inline-block bg-black/85 px-2.5 py-1.5 rounded-lg border border-yellow-400/90 shadow-xl";
+                    subText.className = "text-yellow-300 font-black text-[11px] leading-tight drop-shadow-md";
+                } else if (styleVal === 'red_pill') {
+                    box.className = "inline-block bg-red-600/95 px-3 py-1.5 rounded-full border border-white/90 shadow-xl";
+                    subText.className = "text-white font-black text-[11px] leading-tight";
+                } else {
+                    box.className = "inline-block bg-emerald-950/90 px-2.5 py-1.5 rounded-lg border border-emerald-400 shadow-xl";
+                    subText.className = "text-emerald-300 font-black text-[11px] leading-tight";
+                }
+            }
+        }
+
+        function autoGenerateHook() {
+            const headlineInput = document.getElementById('studio-headline');
+            const headline = (headlineInput ? headlineInput.value : '').trim();
+            const charKey = document.getElementById('studio-citizen-char').value;
+            
+            const hooks = {
+                moul_taxi: [
+                    `وا عباد الله! واش كتضحكو علينا ولا شنو؟! قالك "${headline || 'هاد القرار'}"! راه الطاكسي ما بقاش كيدخل حتى حق المازوط!`,
+                    `أ سيدي المسؤول واش كتعرفو كازا وفين واصلة؟! قالك "${headline || 'إصلاح جديد'}" وحنا كنخلصو من جيوبنا!`,
+                    `واش بصح هادشي ولا غير كاميرا خفية؟! قالك "${headline || 'زيادة أخرى'}"! واش هادشي كيعقل عليه بنادم؟!`
+                ],
+                mi_aicha: [
+                    `وا عباد الله! واش شفتو قفة الخضرة بشحال ولات؟! قالك "${headline || 'المخطط الجديد'}" وحنا مطيشة بـ 15 درهم!`,
+                    `أودي يا وليدي، عيينا من لغة الخشب! قالك "${headline || 'هاد الأخبار'}" والسوق الأسبوعي شاعل فيه العافية!`,
+                    `واش حنا عايشين فالمغرب ولا فشي كوكب آخر؟! قالك "${headline || 'توازن مالي'}" والقفة خاوية!`
+                ],
+                ba_rahal: [
+                    `يا سيدي ربي ترحمنا! السحاب ما كاين والعلف غالي وقالك "${headline || 'دعم الفلاح'}"! واش هادشي كيوصل للبادية؟!`,
+                    `وا عباد الله! الأرض يابسة والبهايم ما لقاوش ما ياكلو، وتوما خارجين بـ "${headline || 'هاد البلاغ'}"؟!`,
+                    `الفلاح البسيط كياكل الدق، والمسؤول كيضرب كرافاطة وكيقولك "${headline || 'العام زين'}"!`
+                ],
+                moul_hanout: [
+                    `وا عباد الله! الكناش ديال الكريدي سالاو وراقو! قالك "${headline || 'الأسعار مستقرة'}" والسلعة تزادت من الشركة!`,
+                    `المواطن كيجي عندي كيتصدم فالثمن، وقالك "${headline || 'التضخم هبط'}"! واش كتضحكو علينا؟!`,
+                    `ها الفاتورة قدامي، كلشي تزاد فيه الدرهم والزوج، وإعلامكم كيزوق فـ "${headline || 'الواقع'}"!`
+                ],
+                oustad_teacher: [
+                    `وا عباد الله! حتى قطاع التعليم ما سلمش؟! قالك "${headline || 'إصلاح المنظومة'}" والأقسام كتعاني من الاكتظاظ!`,
+                    `الأستاذ كيبني الأجيال والقرارات كتنزل بالبراشوت! قالك "${headline || 'هاد المشروع'}" بلا إشراك الميدان!`,
+                    `سعادة المسؤول، التعليم هو أساس أي نهضة، كيفاش كتبررو هاد التناقض فـ "${headline || 'هاد الملف'}"؟!`
+                ],
+                tabib_doctor: [
+                    `المستعجلات عامرة والدوا ناقص وقالك "${headline || 'تأهيل المستشفيات'}"! راه الأطباء والممرضين كيعياو!`,
+                    `وا عباد الله! صحة المواطن ماشي لعبة! قالك "${headline || 'إصلاح صحي'}" والسكانير كيتسناو فيه 6 شهور!`,
+                    `كنشوفو المعاناة كل ليلة، وتوما خارجين بأرقام وردية على "${headline || 'القطاع الصحي'}"!`
+                ]
+            };
+
+            const charHooks = hooks[charKey] || hooks.moul_taxi;
+            const chosen = charHooks[Math.floor(Math.random() * charHooks.length)];
+            document.getElementById('studio-dialogue-hook').value = chosen;
+            updateLiveSubtitlesPreview();
+            showToast('تم توليد هوك ساخر ذكي بنجاح! ⚡');
         }
 
         function previewAudioFormant() {
@@ -545,7 +724,6 @@
 
         function populateStudioFromTopic(title) {
             document.getElementById('studio-headline').value = title;
-            document.getElementById('studio-dialogue-hook').value = `وا عباد الله! واش كتضحكو علينا ولا شنو؟! قالك "${title}"! واش هادشي كيعقل عليه بنادم؟!`;
             
             // Contextual character selection
             if (title.includes('فلاح') || title.includes('سدود') || title.includes('جفاف') || title.includes('حليب')) {
@@ -561,6 +739,8 @@
             } else {
                 document.getElementById('studio-citizen-char').value = 'moul_taxi';
             }
+            
+            autoGenerateHook();
             updateStudioPreview();
             switchTab('studio');
             showToast('تم تحميل بيانات الخبر في استوديو التوليد! 🎬');
@@ -574,13 +754,18 @@
             }
             const charKey = document.getElementById('studio-citizen-char').value;
             const charMeta = characterMetadata[charKey] || characterMetadata.moul_taxi;
+            const subStyle = document.getElementById('studio-subtitle-style').value;
+            const sfxChoice = document.getElementById('studio-sfx').value;
+            const bgmChoice = document.getElementById('studio-bgm').value;
             
             const newJob = {
                 id: 'job_' + Date.now().toString().slice(-4),
                 headline: headline,
                 character: charMeta.name + ' vs المسؤول',
-                voice_pitch: charKey === 'mi_aicha' ? 'Feminine Expressive (1.10x)' : 'Masculine Energetic (0.70x)',
+                voice_pitch: charKey === 'mi_aicha' ? 'Feminine Expressive (Pitch 1.12)' : (charKey === 'official_minister' ? 'Baritone (0.60)' : 'Masculine (0.74)'),
                 motion: 'Kinetic Punch-Zoom (' + document.getElementById('studio-camera').value + 'x)',
+                style: subStyle === 'yellow_glow' ? 'Viral Yellow' : 'Red Pill',
+                audio_fx: `${sfxChoice} + ${bgmChoice}`,
                 status: 'تم الإرسال للمحرك السحابي ⚡',
                 duration: '40s تقريباً',
                 timestamp: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
@@ -736,6 +921,7 @@
                         <div>
                             <h4 class="text-xs font-bold text-white">${q.headline}</h4>
                             <p class="text-[10px] text-gray-400 mt-0.5">${q.character} • ${q.voice_pitch} • ${q.motion}</p>
+                            ${q.style ? `<span class="inline-block mt-1 text-[9px] bg-red-950/60 border border-red-800/70 text-red-300 px-1.5 py-0.5 rounded font-mono">🎨 ${q.style} • 🔊 ${q.audio_fx || 'Standard Audio'}</span>` : ''}
                         </div>
                     </div>
                     <div class="flex items-center gap-2 self-end sm:self-auto text-[10px]">
