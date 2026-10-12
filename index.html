@@ -29,6 +29,43 @@
         </div>
     </div>
 
+    <!-- Dispatch Guidance Modal -->
+    <div id="dispatch-modal" class="fixed inset-0 z-50 bg-black/85 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-gray-900 border border-gray-700 max-w-md w-full rounded-2xl p-6 shadow-2xl relative text-right animate-in fade-in zoom-in duration-200">
+            <div class="w-12 h-12 rounded-xl bg-red-600/20 border border-red-500/40 text-red-400 flex items-center justify-center text-2xl mb-4 mx-auto">
+                ⚡
+            </div>
+            <h3 class="text-base font-bold text-white text-center mb-2">كيفية إطلاق التوليد السحابي المجاني (100% Free)</h3>
+            <p class="text-xs text-gray-300 leading-relaxed text-center mb-4">
+                توليد الفيديو وحركة الشفاه بالذكاء الاصطناعي يتطلب كارت شاشة GPU قوي، لذلك يتم تشغيله على سيرفرات <strong class="text-white">GitHub Actions</strong> المجانية.
+            </p>
+            
+            <div class="bg-gray-950 p-3.5 rounded-xl border border-gray-800 text-xs text-gray-300 space-y-2 mb-5">
+                <div class="flex items-start gap-2">
+                    <span class="bg-red-600 text-white text-[10px] font-bold w-5 h-5 rounded flex items-center justify-center shrink-0 mt-0.5">1</span>
+                    <span>اضغط على الزر الأحمر بالأسفل للانتقال إلى GitHub.</span>
+                </div>
+                <div class="flex items-start gap-2">
+                    <span class="bg-red-600 text-white text-[10px] font-bold w-5 h-5 rounded flex items-center justify-center shrink-0 mt-0.5">2</span>
+                    <span>في صفحة GitHub ستجد زراً رمادياً يمين الصفحة اسمه <strong class="text-emerald-400">Run workflow</strong> (كما بالصورة).</span>
+                </div>
+                <div class="flex items-start gap-2">
+                    <span class="bg-red-600 text-white text-[10px] font-bold w-5 h-5 rounded flex items-center justify-center shrink-0 mt-0.5">3</span>
+                    <span>انقر على <strong class="text-emerald-400">Run workflow</strong> ثم الزر الأخضر، وسيبدأ السيرفر فوراً في إنتاج الفيديو خلال 3 إلى 4 دقائق! 🎬</span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-3">
+                <button onclick="launchGitHubAction()" class="flex-1 bg-red-600 hover:bg-red-500 active:scale-95 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition shadow-lg shadow-red-950/80 flex items-center justify-center gap-1.5">
+                    <span>الانتقال والضغط على Run workflow 🚀</span>
+                </button>
+                <button onclick="closeDispatchModal()" class="bg-gray-800 hover:bg-gray-700 text-gray-300 py-2.5 px-4 rounded-xl text-xs border border-gray-700 transition">
+                    إلغاء
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Header -->
     <header class="border-b border-gray-800 bg-gray-900/90 backdrop-blur sticky top-0 z-40">
         <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
@@ -821,19 +858,34 @@
                 motion: 'Kinetic Punch-Zoom (' + document.getElementById('studio-camera').value + 'x)',
                 style: subStyle === 'yellow_glow' ? 'Viral Yellow' : 'Red Pill',
                 audio_fx: `${sfxChoice} + ${bgmChoice}`,
-                status: 'تم الإرسال للمحرك السحابي ⚡',
+                status: 'في انتظار الضغط على Run workflow في GitHub ⏳',
                 duration: '40s تقريباً',
                 timestamp: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
             };
             
             cachedQueue.unshift(newJob);
             renderQueue(cachedQueue);
-            showToast('تم إدراج الحلقة في قائمة التوليد السحابي! 🚀');
             
-            // Trigger GitHub Actions dispatch
-            setTimeout(() => {
-                window.open("https://github.com/slimanix/morocco-tiktok-studio/actions/workflows/daily_tiktok_factory.yml", "_blank");
-            }, 1000);
+            // Show interactive Dispatch Guidance Modal
+            const modal = document.getElementById('dispatch-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                modal.classList.add('flex');
+            }
+        }
+
+        function closeDispatchModal() {
+            const modal = document.getElementById('dispatch-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+        }
+
+        function launchGitHubAction() {
+            window.open("https://github.com/slimanix/morocco-tiktok-studio/actions/workflows/daily_tiktok_factory.yml", "_blank");
+            closeDispatchModal();
+            showToast('تم فتح صفحة GitHub Actions! اضغط على Run workflow لبدء الرندرة السحابية 🚀');
         }
 
         function resolveVideoUrl(src) {
