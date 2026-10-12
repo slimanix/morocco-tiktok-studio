@@ -482,13 +482,13 @@
         let cachedQueue = [];
 
         const characterMetadata = {
-            moul_taxi: { name: "مول الطاكسي (كازا)", img: "output/characters/moul_taxi.jpg", desc: "صوت رجولي حاد مع حركات شفاه مغلقة جاهزة للنطق", audio: "output/test_taxi_voice.mp3" },
-            ba_rahal: { name: "با رحال (الفلاح)", img: "output/characters/ba_rahal_farmer.jpg", desc: "صوت بدوي جهوري (أخبار الفلاحة والجفاف)", audio: "output/test_taxi_voice.mp3" },
-            moul_hanout: { name: "مول الحانوت (سوس)", img: "output/characters/moul_hanout.jpg", desc: "صوت تجاري ساخر (الأسعار والتضخم والكناش)", audio: "output/test_taxi_voice.mp3" },
-            mi_aicha: { name: "مي عيشة (ربة بيت)", img: "output/characters/mi_aicha_housewife.jpg", desc: "صوت نسائي مغربي نقي ومتحمس (قفة السوق)", audio: "output/test_female_voice.mp3" },
-            oustad_teacher: { name: "الأستاذ (رجل التعليم)", img: "output/characters/oustad_teacher.jpg", desc: "صوت مثقف صبور (التعليم والمدارس)", audio: "output/test_taxi_voice.mp3" },
-            tabib_doctor: { name: "طبيب المستعجلات", img: "output/characters/tabib_doctor.jpg", desc: "صوت متعب ومباشر (الصحة ونقص الأدوية)", audio: "output/test_taxi_voice.mp3" },
-            official_minister: { name: "المسؤول الحكومي", img: "output/characters/official_minister.jpg", desc: "صوت باريتون رخيم (تبرير القرارات ولغة الخشب)", audio: "output/test_official_voice.mp3" }
+            moul_taxi: { name: "مول الطاكسي (كازا)", img: "output/characters/moul_taxi.jpg", desc: "صوت رجولي حاد وعصبي (1.24x, Pitch 0.74)", audio: "output/voice_moul_taxi.mp3" },
+            official_minister: { name: "المسؤول الحكومي", img: "output/characters/official_minister.jpg", desc: "صوت باريتون رخيم وبارد (1.02x, Pitch 0.60)", audio: "output/voice_official_minister.mp3" },
+            mi_aicha: { name: "مي عيشة (ربة بيت)", img: "output/characters/mi_aicha_housewife.jpg", desc: "صوت نسائي مغربي نقي ومتحمس (Pitch 1.12)", audio: "output/voice_mi_aicha.mp3" },
+            ba_rahal: { name: "با رحال (الفلاح)", img: "output/characters/ba_rahal_farmer.jpg", desc: "صوت بدوي جهوري أصيل (Pitch 0.64)", audio: "output/voice_ba_rahal.mp3" },
+            moul_hanout: { name: "مول الحانوت (سوس)", img: "output/characters/moul_hanout.jpg", desc: "صوت تجاري ساخر وسريع (1.20x, Pitch 0.78)", audio: "output/voice_moul_hanout.mp3" },
+            oustad_teacher: { name: "الأستاذ (رجل التعليم)", img: "output/characters/oustad_teacher.jpg", desc: "صوت مثقف رزين وواضح (Pitch 0.69)", audio: "output/voice_oustad_teacher.mp3" },
+            tabib_doctor: { name: "طبيب المستعجلات", img: "output/characters/tabib_doctor.jpg", desc: "صوت متعب وصارم (Pitch 0.66)", audio: "output/voice_tabib_doctor.mp3" }
         };
 
         function showToast(message) {
@@ -800,7 +800,7 @@
                                 <p class="text-[10px] text-gray-500 mt-1 line-clamp-2"><strong>المواضيع:</strong> ${c.topics}</p>
                                 <div class="flex items-center justify-between mt-2 pt-1 border-t border-gray-850">
                                     <span class="text-[10px] text-emerald-400 font-mono">🎙️ ${c.voice_type}</span>
-                                    <button onclick="playCharacterAudio('${c.id === 'official_minister' ? 'output/test_official_voice.mp3' : 'output/test_taxi_voice.mp3'}', '${c.name}')" class="text-[10px] bg-gray-800 hover:bg-gray-700 text-gray-200 px-2 py-0.5 rounded">🔊 استمع</button>
+                                    <button onclick="playCharacterAudio('${c.audio_sample || (characterMetadata[c.id] ? characterMetadata[c.id].audio : 'output/voice_moul_taxi.mp3')}', '${c.name}')" class="text-[10px] bg-gray-800 hover:bg-gray-700 text-gray-200 px-2.5 py-1 rounded font-bold transition">🔊 استمع</button>
                                 </div>
                             </div>
                         </div>

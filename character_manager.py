@@ -65,16 +65,16 @@ def get_or_generate_character_for_topic(headline):
                     label = ROLE_LABELS.get(role, "المواطن (معصب)")
                     gender = ROLE_GENDERS.get(role, "male")
                     print(f"🎭 Matched archetype [{role}: {label} | Gender: {gender}] for topic: '{headline[:30]}...'")
-                    return matched_file, label, gender
+                    return matched_file, label, gender, role
                     
     # 2. If it's a doctor/health topic
     if any(k in headline for k in KEYWORD_MAP.get("doctor", [])):
         dest = FILE_MAP["doctor"]
-        return dest, ROLE_LABELS["doctor"], "male"
+        return dest, ROLE_LABELS["doctor"], "male", "doctor"
         
     # Default citizen: Moul Taxi (Male)
     fallback_file = FILE_MAP["taxi"] if os.path.exists(FILE_MAP["taxi"]) else FILE_MAP["grocer"]
-    return fallback_file, ROLE_LABELS["taxi"], "male"
+    return fallback_file, ROLE_LABELS["taxi"], "male", "taxi"
 
 def generate_free_character(description, output_path):
     """Generates any brand-new character on the fly 100% free with Pollinations."""

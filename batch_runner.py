@@ -43,7 +43,7 @@ def run_daily_batch(limit=20):
         
         # Select or auto-generate contextual character for this news headline
         from character_manager import get_or_generate_character_for_topic
-        citizen_char, citizen_label, citizen_gender = get_or_generate_character_for_topic(headline)
+        citizen_char, citizen_label, citizen_gender, citizen_role = get_or_generate_character_for_topic(headline)
         official_char = "output/characters/official_minister.jpg"
         official_label = "المسؤول (كيبرّد الطرح)"
         
@@ -56,9 +56,10 @@ def run_daily_batch(limit=20):
             
             is_citizen = "المواطن" in speaker_type
             current_gender = citizen_gender if is_citizen else "male"
+            role_to_use = citizen_role if is_citizen else "minister"
             
-            # Synthesize audio with exact gender
-            synthesize_audio(text, speaker_type, audio_out, gender=current_gender)
+            # Synthesize audio with exact character acoustic profile
+            synthesize_audio(text, speaker_type, audio_out, gender=current_gender, archetype_role=role_to_use)
             
             img_target = citizen_char if is_citizen else official_char
             badge = citizen_label if is_citizen else official_label
