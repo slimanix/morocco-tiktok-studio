@@ -43,7 +43,8 @@ def run_daily_batch(limit=20):
         
         # Select or auto-generate contextual character for this news headline
         from character_manager import get_or_generate_character_for_topic
-        citizen_char, citizen_label, citizen_gender, citizen_role = get_or_generate_character_for_topic(headline)
+        req_char = ep.get("custom_character") or ep.get("character_id")
+        citizen_char, citizen_label, citizen_gender, citizen_role = get_or_generate_character_for_topic(headline, explicit_role=req_char)
         official_char = "output/characters/official_minister.jpg"
         official_label = "المسؤول (كيبرّد الطرح)"
         
@@ -123,6 +124,22 @@ def run_daily_batch(limit=20):
             
         print(f"   🎉 Fully Enhanced Episode {ep_id} Ready: {final_ep_video}")
         finished_videos.append(final_ep_video)
+
+    # 6. Update episodes_gallery.json dynamically with generated character posters
+    try:
+        gallery_file = "output/episodes_gallery.json"
+        if os.path.exists(gallery_file):
+            with open(gallery_file, "r", encoding="utf-8") as f:
+                gal = json.load(f)
+            for item in gal:
+                matched_char, matched_lbl, _, _ = get_or_generate_character_for_topic(item.get("full_headline", item.get("title", "")))
+                item["characters"] = f"{matched_lbl} vs المسؤول"
+                item["poster"] = matched_char
+            with open(gallery_file, "w", encoding="utf-8") as f:
+                json.dump(gal, f, ensure_ascii=False, indent=2)
+            print("✅ Synchronized episodes_gallery.json with contextual character archetypes!")
+    except Exception as e:
+        print(f"⚠️ Gallery sync error: {e}")
         
     print("\n" + "=" * 65)
     print(f"🏆 ALL {len(finished_videos)} FULLY ENHANCED VIDEOS READY IN: {batch_dir}")

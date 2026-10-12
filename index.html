@@ -846,13 +846,15 @@
             return src;
         }
 
-        function playInMainPlayer(videoSrc, title) {
+        function playInMainPlayer(videoSrc, title, posterSrc, characterDesc) {
             const player = document.getElementById('main-video-player');
             const resolved = resolveVideoUrl(videoSrc);
             player.src = resolved;
+            if (posterSrc) player.poster = posterSrc;
             player.load();
             player.play().catch(() => {});
-            document.getElementById('current-video-title').innerText = title;
+            const titleEl = document.getElementById('current-video-title');
+            if (titleEl) titleEl.innerText = title;
             switchTab('overview');
             window.scrollTo({ top: 150, behavior: 'smooth' });
             showToast(`جاري تشغيل: ${title} 🎬`);
@@ -922,10 +924,11 @@
             const container = document.getElementById('gallery-container');
             container.innerHTML = galleryList.map((g, idx) => {
                 const vidUrl = resolveVideoUrl(g.video_src);
+                const posterUrl = g.poster || 'output/characters/oustad_teacher.jpg';
                 return `
                 <div class="bg-gray-950 border border-gray-800 rounded-xl overflow-hidden flex flex-col p-3 hover:border-gray-700 transition">
-                    <div class="aspect-[9/16] bg-black rounded-lg overflow-hidden border border-gray-850 relative mb-3 group cursor-pointer" onclick="playInMainPlayer('${g.video_src}', '${g.title.replace(/'/g, "\\'")}')">
-                        <video class="w-full h-full object-contain" poster="output/characters/moul_taxi.jpg" preload="none">
+                    <div class="aspect-[9/16] bg-black rounded-lg overflow-hidden border border-gray-850 relative mb-3 group cursor-pointer" onclick="playInMainPlayer('${g.video_src}', '${g.title.replace(/'/g, "\\'")}', '${posterUrl}')">
+                        <video class="w-full h-full object-cover" poster="${posterUrl}" preload="none">
                             <source src="${vidUrl}" type="video/mp4">
                         </video>
                         <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex flex-col justify-end p-2.5">
@@ -939,7 +942,7 @@
                     <p class="text-[10px] text-gray-400 mt-0.5">${g.characters}</p>
                     <div class="flex items-center justify-between mt-2 pt-2 border-t border-gray-800 text-[10px] text-gray-500">
                         <span>⏱️ ${g.duration}</span>
-                        <button onclick="playInMainPlayer('${g.video_src}', '${g.title.replace(/'/g, "\\'")}')" class="text-red-400 font-bold hover:underline">تشغيل ⚡</button>
+                        <button onclick="playInMainPlayer('${g.video_src}', '${g.title.replace(/'/g, "\\'")}', '${posterUrl}')" class="text-red-400 font-bold hover:underline">تشغيل ⚡</button>
                     </div>
                 </div>
             `;

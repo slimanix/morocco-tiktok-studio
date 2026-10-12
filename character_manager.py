@@ -10,12 +10,12 @@ if sys.platform == "win32":
 CHARACTERS_DIR = "output/characters"
 
 KEYWORD_MAP = {
-    "housewife": ["قفة", "سوق", "معيشة", "خضار", "مطيشة", "بصلة", "أسر", "أرامل", "دعم", "غلاء المعيشة", "حساء"],
-    "farmer": ["حليب", "أبقار", "فلاحة", "فلاح", "قمح", "شعير", "جفاف", "زيتون"],
-    "taxi": ["مازوط", "بترول", "غازوال", "طاكسي", "نقل", "طوموبيل", "سيارات", "محروقات", "طرق"],
-    "grocer": ["أسعار", "غلاء", "درهم", "تضخم", "زيت", "سكر", "مواد", "تمويل", "ذهب"],
-    "teacher": ["تعليم", "أساتذة", "أستاذ", "مدارس", "تلاميذ", "إضراب", "جامعة"],
-    "doctor": ["صحة", "مستشفيات", "أدوية", "مرضى", "صرع", "أطباء", "صيدليات", "غاردينال"]
+    "teacher": ["برلمان", "حكومة", "المنصوري", "سياسة", "انتخابات", "تشريع", "تعليم", "أساتذة", "أستاذ", "مدارس", "تلاميذ", "إضراب", "جامعة", "وزراء", "أحزاب"],
+    "housewife": ["قفة", "سوق", "معيشة", "خضار", "مطيشة", "بصلة", "أسر", "أرامل", "دعم", "غلاء المعيشة", "حساء", "نساء"],
+    "farmer": ["حليب", "أبقار", "فلاحة", "فلاح", "قمح", "شعير", "جفاف", "زيتون", "ماء", "سدود", "بادية"],
+    "grocer": ["أسعار", "غلاء", "درهم", "تضخم", "زيت", "سكر", "مواد", "تمويل", "ذهب", "تجارة", "ضرائب"],
+    "taxi": ["مازوط", "بترول", "غازوال", "طاكسي", "نقل", "طوموبيل", "سيارات", "محروقات", "طرق", "كازا"],
+    "doctor": ["صحة", "مستشفيات", "أدوية", "مرضى", "صرع", "أطباء", "صيدليات", "غاردينال", "علاج"]
 }
 
 FILE_MAP = {
@@ -33,8 +33,8 @@ ROLE_LABELS = {
     "farmer": "با رحال (الفلاح)",
     "taxi": "مول الطاكسي",
     "grocer": "مول الحانوت",
-    "teacher": "أستاذ محتج",
-    "doctor": "دكتور مستعجلات",
+    "teacher": "الأستاذ (رجل التعليم)",
+    "doctor": "طبيب المستعجلات",
     "citizen": "المواطن (معصب)"
 }
 
@@ -49,14 +49,24 @@ ROLE_GENDERS = {
     "citizen": "male"
 }
 
-def get_or_generate_character_for_topic(headline):
+def get_or_generate_character_for_topic(headline, explicit_role=None):
     """
     Picks the best existing character, badge label, and GENDER (male/female).
-    Returns: (image_path, label, gender)
+    Supports explicit role override from Studio config (e.g. oustad_teacher, mi_aicha, etc.).
+    Returns: (image_path, label, gender, role)
     """
     os.makedirs(CHARACTERS_DIR, exist_ok=True)
     
-    # 1. Match from existing roster
+    # 0. Check explicit requested role first
+    if explicit_role:
+        norm_role = explicit_role.replace("oustad_", "").replace("ba_", "").replace("moul_", "").replace("mi_", "").replace("_housewife", "").replace("_farmer", "")
+        if norm_role in FILE_MAP and os.path.exists(FILE_MAP[norm_role]):
+            label = ROLE_LABELS.get(norm_role, "المواطن")
+            gender = ROLE_GENDERS.get(norm_role, "male")
+            print(f"🎯 Applied Explicit Character Override: [{norm_role}: {label} | {gender}]")
+            return FILE_MAP[norm_role], label, gender, norm_role
+            
+    # 1. Match from keyword map
     for role, keywords in KEYWORD_MAP.items():
         for kw in keywords:
             if kw in headline:
@@ -73,8 +83,8 @@ def get_or_generate_character_for_topic(headline):
         return dest, ROLE_LABELS["doctor"], "male", "doctor"
         
     # Default citizen: Moul Taxi (Male)
-    fallback_file = FILE_MAP["taxi"] if os.path.exists(FILE_MAP["taxi"]) else FILE_MAP["grocer"]
-    return fallback_file, ROLE_LABELS["taxi"], "male", "taxi"
+    fallback_file = FILE_MAP["teacher"] if os.path.exists(FILE_MAP["teacher"]) else FILE_MAP["taxi"]
+    return fallback_file, ROLE_LABELS.get("teacher", "المواطن"), "male", "teacher"
 
 def generate_free_character(description, output_path):
     """Generates any brand-new character on the fly 100% free with Pollinations."""
