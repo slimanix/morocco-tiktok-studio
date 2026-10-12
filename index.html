@@ -115,6 +115,44 @@
                 </div>
             </div>
 
+            <!-- Live Moroccan Context & Free Intelligence Ticker (100% Free APIs) -->
+            <div class="bg-gradient-to-r from-gray-900 via-gray-950 to-gray-900 border border-gray-800 rounded-xl p-4 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="flex items-center gap-2.5 shrink-0">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+                    <span class="text-xs font-bold text-white flex items-center gap-1.5">
+                        📡 رادار السياق المغربي اللحظي (Free Live APIs):
+                    </span>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 w-full text-xs">
+                    <!-- Google Trends MA -->
+                    <div class="bg-gray-900/80 border border-gray-800 p-2.5 rounded-lg flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] text-gray-400 block">🔥 أكثر بحثاً بالمغرب (Google Trends):</span>
+                            <strong id="live-trend-topic" class="text-white text-[11px] line-clamp-1">مباراة المنتخب المغربي والقنوات الناقلة</strong>
+                        </div>
+                        <span id="live-trend-traffic" class="text-[10px] bg-red-600/20 text-red-400 border border-red-500/30 px-1.5 py-0.5 rounded font-mono font-bold shrink-0">+50K</span>
+                    </div>
+
+                    <!-- Open-Meteo Weather -->
+                    <div class="bg-gray-900/80 border border-gray-800 p-2.5 rounded-lg flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] text-gray-400 block">🌦️ طقس وسياق الفلاحة (Open-Meteo):</span>
+                            <strong id="live-weather-info" class="text-white text-[11px]">كازا 22°C • مشمس ومعتدل</strong>
+                        </div>
+                        <span id="live-weather-badge" class="text-[10px] bg-amber-500/20 text-amber-400 border border-amber-500/30 px-1.5 py-0.5 rounded font-mono shrink-0">جفاف 🌾</span>
+                    </div>
+
+                    <!-- ExchangeRate Forex -->
+                    <div class="bg-gray-900/80 border border-gray-800 p-2.5 rounded-lg flex items-center justify-between">
+                        <div>
+                            <span class="text-[10px] text-gray-400 block">💵 سعر الصرف والتضخم (Forex API):</span>
+                            <strong id="live-forex-info" class="text-white text-[11px]">1$ = 9.82 DH • 1€ = 11.00 DH</strong>
+                        </div>
+                        <span id="live-forex-badge" class="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-1.5 py-0.5 rounded font-mono shrink-0">غلاء 🛒</span>
+                    </div>
+                </div>
+            </div>
+
             <!-- Video Player & Topics Live Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 
@@ -200,10 +238,27 @@
                     <!-- Generator Configuration Form -->
                     <div class="lg:col-span-2 space-y-4">
                         
-                        <!-- Headline Input -->
+                        <!-- Headline Input & Free Google Trends Quick Selector -->
                         <div>
-                            <label class="block text-xs font-bold text-gray-300 mb-1.5">عنوان الحلقة أو الخبر الساخن:</label>
-                            <input type="text" id="studio-headline" placeholder="مثال: أسعار المحروقات تلهب جيوب المغاربة والحكومة تبرر" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition">
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label class="block text-xs font-bold text-gray-300">عنوان الحلقة أو الخبر الساخن:</label>
+                                <span class="text-[10px] text-gray-400">🔥 التريندات اللحظية المباشرة (Google Trends API):</span>
+                            </div>
+                            <div id="studio-trends-pills" class="flex flex-wrap gap-1.5 mb-2.5">
+                                <button type="button" onclick="populateStudioFromTopic('مباراة المنتخب المغربي والقنوات الناقلة')" class="text-[10px] bg-gray-950 hover:bg-gray-800 text-gray-300 border border-gray-800 hover:border-red-500/50 px-2 py-1 rounded-lg transition flex items-center gap-1">
+                                    <span>🇲🇦 المنتخب المغربي</span>
+                                    <span class="text-red-400 font-bold">+50K</span>
+                                </button>
+                                <button type="button" onclick="populateStudioFromTopic('أسعار المحروقات والغاز بالمغرب تلهب جيوب المواطنين')" class="text-[10px] bg-gray-950 hover:bg-gray-800 text-gray-300 border border-gray-800 hover:border-red-500/50 px-2 py-1 rounded-lg transition flex items-center gap-1">
+                                    <span>⛽ أسعار المحروقات</span>
+                                    <span class="text-red-400 font-bold">+20K</span>
+                                </button>
+                                <button type="button" onclick="populateStudioFromTopic('افتتاح الدورة البرلمانية وتشكيل الحكومة الجديدة')" class="text-[10px] bg-gray-950 hover:bg-gray-800 text-gray-300 border border-gray-800 hover:border-red-500/50 px-2 py-1 rounded-lg transition flex items-center gap-1">
+                                    <span>🏛️ البرلمان والحكومة</span>
+                                    <span class="text-red-400 font-bold">+10K</span>
+                                </button>
+                            </div>
+                            <input type="text" id="studio-headline" oninput="updateLiveSubtitlesPreview()" placeholder="مثال: أسعار المحروقات تلهب جيوب المغاربة والحكومة تبرر" class="w-full bg-gray-950 border border-gray-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:border-red-500 transition">
                         </div>
 
                         <!-- Character Selection -->
@@ -1062,6 +1117,58 @@
                 }
             } catch (err) {
                 console.warn("Queue update error:", err);
+            }
+
+            // 8. Live 100% Free Intelligence APIs (Google Trends MA, Weather, Forex)
+            try {
+                const resTrends = await fetch('/api/trends?t=' + Date.now()).catch(() => null);
+                if (resTrends && resTrends.ok) {
+                    const trends = await resTrends.json();
+                    if (Array.isArray(trends) && trends.length > 0) {
+                        const topTrend = trends[0];
+                        const tTopicEl = document.getElementById('live-trend-topic');
+                        if (tTopicEl) tTopicEl.innerText = topTrend.topic;
+                        const tTrafficEl = document.getElementById('live-trend-traffic');
+                        if (tTrafficEl) tTrafficEl.innerText = topTrend.traffic;
+
+                        // Also populate studio quick pills with top 3 trends
+                        const pillsContainer = document.getElementById('studio-trends-pills');
+                        if (pillsContainer) {
+                            pillsContainer.innerHTML = trends.slice(0, 3).map(t => `
+                                <button type="button" onclick="populateStudioFromTopic('${(t.topic || '').replace(/'/g, "\\'")}')" class="text-[10px] bg-gray-950 hover:bg-gray-800 text-gray-300 border border-gray-800 hover:border-red-500/50 px-2 py-1 rounded-lg transition flex items-center gap-1">
+                                    <span>🔥 ${t.topic.slice(0, 30)}</span>
+                                    <span class="text-red-400 font-bold">${t.traffic}</span>
+                                </button>
+                            `).join('');
+                        }
+                    }
+                }
+            } catch (err) {
+                console.warn("Trends fetch error:", err);
+            }
+
+            try {
+                const resWeather = await fetch('/api/weather?t=' + Date.now()).catch(() => null);
+                if (resWeather && resWeather.ok) {
+                    const weather = await resWeather.json();
+                    const wEl = document.getElementById('live-weather-info');
+                    if (wEl) wEl.innerText = `${weather.city} ${weather.temperature} • ${weather.condition}`;
+                    const wBadge = document.getElementById('live-weather-badge');
+                    if (wBadge) wBadge.innerText = weather.rain_chance.includes('منخفضة') ? 'جفاف 🌾' : 'ممطر 🌧️';
+                }
+            } catch (err) {
+                console.warn("Weather fetch error:", err);
+            }
+
+            try {
+                const resForex = await fetch('/api/forex?t=' + Date.now()).catch(() => null);
+                if (resForex && resForex.ok) {
+                    const forex = await resForex.json();
+                    const fEl = document.getElementById('live-forex-info');
+                    if (fEl) fEl.innerText = `1$ = ${forex.usd_mad} • 1€ = ${forex.eur_mad}`;
+                }
+            } catch (err) {
+                console.warn("Forex fetch error:", err);
             }
         }
 
