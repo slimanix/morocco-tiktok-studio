@@ -1,7 +1,8 @@
 output/batch_*
 output/lipsync_parts/
 output/frames/
-*.mp3
+output/check_*.mp3
+output/test_base_*.mp3
 *.log
 .git
 .github
