@@ -57,6 +57,28 @@ def run_daily_cycle(auto_upload=False):
         slot = target["times"][i-1] if isinstance(target["times"], list) and i <= len(target["times"]) else "AUTO_INTERVAL"
         print(f"   ⏰ Video {i}: {os.path.basename(v_path)} ➡️ Scheduled for: {slot} (Morocco Time)")
         
+        if auto_upload:
+            print(f"   🚀 AUTO UPLOAD INITIATED FOR VIDEO {i} (Multi-Platform)...")
+            metadata = generate_tiktok_post_metadata(ep_id=i) # Assuming ep_id aligns with daily count for simplicity
+
+            # TikTok Upload
+            try:
+                from tiktok_uploader import upload_video_to_tiktok
+                print("      -> Uploading to TikTok...")
+                upload_video_to_tiktok(v_path, caption=metadata, headless=True)
+            except Exception as e:
+                print(f"      ❌ TikTok upload failed: {e}")
+
+            # YouTube Upload
+            try:
+                from youtube_uploader import upload_video_to_youtube
+                print("      -> Uploading to YouTube Shorts...")
+                # Extract title from metadata (first line usually)
+                title = metadata.split('\n')[0][:100] if metadata else "Moroccan News Update"
+                upload_video_to_youtube(v_path, title=title, description=metadata, headless=True)
+            except Exception as e:
+                print(f"      ❌ YouTube upload failed: {e}")
+
     print("\n" + "=" * 65)
     print("🎉 DAILY CYCLE COMPLETE! Videos ready in output folder.")
     print("=" * 65)

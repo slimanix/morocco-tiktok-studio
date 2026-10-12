@@ -75,8 +75,40 @@ raw_concat = f"{ep_dir}/raw_concat.mp4"
 fast_ffmpeg_concat(enhanced_scenes, raw_concat)
 
 # Apply kinetic camera punch-zoom
+kinetic_ep = f"{ep_dir}/kinetic_concat.mp4"
+apply_kinetic_zoom(raw_concat, kinetic_ep, zoom_factor=1.08)
+
 final_ep = "output/batch_2026-10-10/episode_1.mp4"
-apply_kinetic_zoom(raw_concat, final_ep, zoom_factor=1.08)
+
+# Apply background audio if available
+bg_music = "output/sfx_impact.wav" # using existing impact sound as test or we can check for bgm.mp3
+if os.path.exists(bg_music):
+    try:
+        from moviepy import VideoFileClip, AudioFileClip, CompositeAudioClip
+        print(f"🎵 Applying background audio: {bg_music}")
+        video = VideoFileClip(kinetic_ep)
+        music = AudioFileClip(bg_music).with_volume_multiplier(0.15)
+
+        # Loop music if shorter than video, or cut if longer
+        if music.duration < video.duration:
+            from moviepy.audio.fx.MultiplyVolume import MultiplyVolume
+            from moviepy.audio.fx.AudioLoop import AudioLoop
+            # music = music.fx(AudioLoop, duration=video.duration) # Alternative
+            # For simplicity, we just use the duration
+
+        music = music.with_duration(video.duration)
+
+        final_audio = CompositeAudioClip([video.audio, music])
+        final_video = video.with_audio(final_audio)
+        final_video.write_videofile(final_ep, codec="libx264", audio_codec="aac", logger=None)
+        video.close()
+        music.close()
+        print("✅ Background audio applied successfully.")
+    except Exception as e:
+        print(f"⚠️ Error applying background audio: {e}")
+        shutil.copy(kinetic_ep, final_ep)
+else:
+    shutil.copy(kinetic_ep, final_ep)
 
 # Update showcase preview for dashboard
 shutil.copy(final_ep, "output/test_official_with_subtitles.mp4")

@@ -216,6 +216,44 @@ class DashboardHandler(SimpleHTTPRequestHandler):
         # Serve static media from output/
         return super().do_GET()
 
+    def do_POST(self):
+        parsed = urllib.parse.urlparse(self.path)
+        if parsed.path == "/api/manual_generate":
+            content_length = int(self.headers.get('Content-Length', 0))
+            post_data = self.rfile.read(content_length)
+
+            try:
+                data = json.loads(post_data.decode("utf-8"))
+                topic_title = data.get("title", "")
+
+                # We would normally hook this into the script generator here.
+                # For now, we simulate starting the process or writing to a file.
+                print(f"\n[DASHBOARD] Manual generation requested for topic: {topic_title}")
+
+                # E.g. save to a manual_queue.json to be picked up by the daemon
+                queue_file = "output/manual_queue.json"
+                queue = []
+                if os.path.exists(queue_file):
+                    with open(queue_file, "r", encoding="utf-8") as f:
+                        queue = json.load(f)
+                queue.append({"title": topic_title, "timestamp": os.stat(__file__).st_mtime})
+                with open(queue_file, "w", encoding="utf-8") as f:
+                    json.dump(queue, f, ensure_ascii=False)
+
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.end_headers()
+                self.wfile.write(json.dumps({"status": "success", "message": f"Topic '{topic_title}' queued for generation."}).encode("utf-8"))
+            except Exception as e:
+                self.send_response(400)
+                self.send_header("Content-Type", "application/json; charset=utf-8")
+                self.end_headers()
+                self.wfile.write(json.dumps({"status": "error", "message": str(e)}).encode("utf-8"))
+            return
+
+        self.send_response(404)
+        self.end_headers()
+
 def start_dashboard():
     server = HTTPServer(("0.0.0.0", PORT), DashboardHandler)
     print(f"🚀 Dashboard running live at: http://localhost:{PORT}")
