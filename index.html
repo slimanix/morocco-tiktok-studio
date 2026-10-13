@@ -844,9 +844,13 @@
                 showToast('يرجى كتابة عنوان للحلقة أولاً!');
                 return;
             }
-            const charKey = document.getElementById('studio-citizen-char').value;
+            const charKey = document.getElementById('studio-citizen-char') ? document.getElementById('studio-citizen-char').value : 'moul_taxi';
             const charMeta = characterMetadata[charKey] || characterMetadata.moul_taxi;
-            const subStyle = document.getElementById('studio-subtitle-style').value;
+            const subStyle = document.getElementById('studio-subtitle-style') ? document.getElementById('studio-subtitle-style').value : 'yellow_glow';
+            const sfxSelect = document.getElementById('studio-sfx');
+            const sfxChoice = sfxSelect ? sfxSelect.value : 'subtle_hits';
+            const bgmSelect = document.getElementById('studio-bgm');
+            const bgmChoice = bgmSelect ? bgmSelect.value : 'moroccan_tension';
             const hookVal = (document.getElementById('studio-dialogue-hook').value || '').trim();
             const camZoom = document.getElementById('studio-camera') ? document.getElementById('studio-camera').value : '1.10';
             
