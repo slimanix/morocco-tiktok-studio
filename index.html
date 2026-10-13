@@ -839,54 +839,78 @@
         }
 
         function queueAndGenerateEpisode() {
-            const headline = (document.getElementById('studio-headline').value || '').trim();
-            if (!headline) {
-                showToast('يرجى كتابة عنوان للحلقة أولاً!');
-                return;
-            }
-            const charKey = document.getElementById('studio-citizen-char') ? document.getElementById('studio-citizen-char').value : 'moul_taxi';
-            const charMeta = characterMetadata[charKey] || characterMetadata.moul_taxi;
-            const subStyle = document.getElementById('studio-subtitle-style') ? document.getElementById('studio-subtitle-style').value : 'yellow_glow';
-            const sfxSelect = document.getElementById('studio-sfx');
-            const sfxChoice = sfxSelect ? sfxSelect.value : 'subtle_hits';
-            const bgmSelect = document.getElementById('studio-bgm');
-            const bgmChoice = bgmSelect ? bgmSelect.value : 'moroccan_tension';
-            const hookVal = (document.getElementById('studio-dialogue-hook').value || '').trim();
-            const camZoom = document.getElementById('studio-camera') ? document.getElementById('studio-camera').value : '1.10';
-            
-            const newJob = {
-                id: 'job_' + Date.now().toString().slice(-4),
-                headline: headline,
-                character: charMeta.name + ' vs المسؤول',
-                character_key: charKey,
-                hook: hookVal,
-                subtitle_style: subStyle,
-                zoom_factor: parseFloat(camZoom) || 1.10,
-                voice_pitch: charKey === 'mi_aicha' ? 'Feminine Expressive (Pitch 1.12)' : (charKey === 'official_minister' ? 'Baritone (0.60)' : 'Masculine (0.74)'),
-                motion: 'Kinetic Punch-Zoom (' + camZoom + 'x)',
-                style: subStyle === 'yellow_glow' ? 'Viral Yellow' : (subStyle === 'red_pill' ? 'Red Pill' : 'Emerald Green'),
-                audio_fx: `${sfxChoice} + ${bgmChoice}`,
-                status: 'في انتظار الضغط على Run workflow في GitHub ⏳',
-                duration: '40s تقريباً',
-                timestamp: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
-            };
-            
-            cachedQueue.unshift(newJob);
-            renderQueue(cachedQueue);
-            
-            // Show interactive Dispatch Guidance Modal
-            const modal = document.getElementById('dispatch-modal');
-            if (modal) {
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
+            try {
+                const headlineInput = document.getElementById('studio-headline');
+                const headline = (headlineInput ? headlineInput.value : '').trim();
+                if (!headline) {
+                    showToast('يرجى كتابة عنوان للحلقة أولاً!');
+                    if (headlineInput) headlineInput.focus();
+                    return;
+                }
+                
+                const charSelect = document.getElementById('studio-citizen-char');
+                const charKey = charSelect ? charSelect.value : 'moul_taxi';
+                const charMeta = (typeof characterMetadata !== 'undefined' && characterMetadata[charKey]) ? characterMetadata[charKey] : { name: "المواطن" };
+                
+                const styleSelect = document.getElementById('studio-subtitle-style');
+                const subStyle = styleSelect ? styleSelect.value : 'yellow_glow';
+                
+                const sfxSelect = document.getElementById('studio-sfx');
+                const sfxChoice = sfxSelect ? sfxSelect.value : 'subtle_hits';
+                
+                const bgmSelect = document.getElementById('studio-bgm');
+                const bgmChoice = bgmSelect ? bgmSelect.value : 'moroccan_tension';
+                
+                const hookInput = document.getElementById('studio-dialogue-hook');
+                const hookVal = (hookInput ? hookInput.value : '').trim();
+                
+                const camSelect = document.getElementById('studio-camera');
+                const camZoom = camSelect ? camSelect.value : '1.10';
+                
+                const newJob = {
+                    id: 'job_' + Date.now().toString().slice(-4),
+                    headline: headline,
+                    character: (charMeta.name || 'المواطن') + ' vs المسؤول',
+                    character_key: charKey,
+                    hook: hookVal,
+                    subtitle_style: subStyle,
+                    zoom_factor: parseFloat(camZoom) || 1.10,
+                    voice_pitch: charKey === 'mi_aicha' ? 'Feminine Expressive (Pitch 1.12)' : (charKey === 'official_minister' ? 'Baritone (0.60)' : 'Masculine (0.74)'),
+                    motion: 'Kinetic Punch-Zoom (' + camZoom + 'x)',
+                    style: subStyle === 'yellow_glow' ? 'Viral Yellow' : (subStyle === 'red_pill' ? 'Red Pill' : 'Emerald Green'),
+                    audio_fx: `${sfxChoice} + ${bgmChoice}`,
+                    status: 'في انتظار الضغط على Run workflow في GitHub ⏳',
+                    duration: '40s تقريباً',
+                    timestamp: new Date().toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })
+                };
+                
+                if (typeof cachedQueue !== 'undefined') {
+                    cachedQueue.unshift(newJob);
+                    renderQueue(cachedQueue);
+                }
+                
+                showToast('جاري تحضير مهمة الإنتاج السحابي... 🚀');
+                
+                // Show modal with direct display style to override Tailwind hidden
+                const modal = document.getElementById('dispatch-modal');
+                if (modal) {
+                    modal.style.display = 'flex';
+                } else {
+                    // Direct fallback if modal element is missing
+                    window.open("https://github.com/slimanix/morocco-tiktok-studio/actions/workflows/daily_tiktok_factory.yml", "_blank");
+                }
+            } catch (err) {
+                console.error("Queue Generation Error:", err);
+                // Fallback guarantee: open workflow page directly
+                window.open("https://github.com/slimanix/morocco-tiktok-studio/actions/workflows/daily_tiktok_factory.yml", "_blank");
+                showToast('تم فتح سيرفر GitHub Actions مباشرة! اضغط على Run workflow 🚀');
             }
         }
 
         function closeDispatchModal() {
             const modal = document.getElementById('dispatch-modal');
             if (modal) {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
+                modal.style.display = 'none';
             }
         }
 
